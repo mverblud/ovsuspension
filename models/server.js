@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-//const { dbConnection } = require('../database/config');
+const { dbConnection } = require('../database/config');
 //const fileUpload = require('express-fileupload');
 
 class Server {
@@ -9,17 +9,17 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         this.path = {
-            auth:       '/api/auth',
-            buscar:     '/api/buscar',
-            categorias: '/api/categorias',
-            productos:  '/api/productos',
-            usuarios:   '/api/usuarios',
-            uploads:    '/api/uploads'
+            auth: '/api/auth',
+            buscar: '/api/buscar',
+            marcaProductos: '/api/marcaProductos',
+            productos: '/api/productos',
+            usuarios: '/api/usuarios',
+            uploads: '/api/uploads'
         }
 
         // Conectar a base de datos
         this.conectarDB();
-        
+
         // Middlewares
         this.middlewares();
 
@@ -27,8 +27,8 @@ class Server {
         this.routes();
     }
 
-    async conectarDB(){
-    //    await dbConnection();
+    async conectarDB() {
+        await dbConnection();
     }
 
     middlewares() {
@@ -43,17 +43,17 @@ class Server {
         this.app.use(express.static('public'));
 
         // Fileupload - Carga de Archivos
-/*         this.app.use(fileUpload({
-            useTempFiles : true,
-            tempFileDir : '/tmp/',
-            createParentPath: true
-        })); */
+        /*         this.app.use(fileUpload({
+                    useTempFiles : true,
+                    tempFileDir : '/tmp/',
+                    createParentPath: true
+                })); */
     }
 
     routes() {
 
-    //    this.app.use(this.path.productos, require('../routes/productos'));
-
+        //    this.app.use(this.path.productos, require('../routes/productos'));
+        this.app.use(this.path.marcaProductos, require('../routes/marcaProductos'));
 
     }
 
