@@ -1,58 +1,49 @@
-const { Schema, model } = require('mongoose');
+const { Router } = require('express');
+const { check } = require('express-validator');
 
-const ProductoSchema = Schema({
-    codigo: {
-        type: String,
-        required: [true, 'El codigo es obligatorio'],
-        unique: true,
-    },
-    nombre: {
-        type: String,
-        required: [true, 'El nombre es obligatorio'],
-    },
-    provedor: {
-        type: String,
-        required: [true, 'El proveedor es obligatorio'],
-    },
-    marcaAuto: {
-        type: String,
-        required: [true, 'La marca del auto es obligatorio'],
-    },
-    marcaProducto: {
-        type: String,
-        required: [true, 'La Marca del producto es obligatorio'],
-    },
-    rubro: {
-        type: String,
-        required: [true, 'La Marca del producto es obligatorio'],
-    },
-    stock:{
-        type:Number,
-        default:0
-    },
-    img: {
-        type: String
-    },
-    descuento:{
-        type:Number,
-        default:0
-    },
-    fechaAlta:{
-        type: Date,
-        default: Date.now
-    },
-    fechaBaja:{
-        type: Date
-    },
-    precio: {
-        type: Number,
-        default: 0
-    },
-});
+const { existeCategoria, existeProducto, existeMarcaProducto, existeMarcaAuto } = require('../helpers/db-validators');
+const { crearProducto, obtenerProductos,obtenerProducto, actualizarProducto, borrarProducto } = require('../controllers/productos');
+const { validarCampos } = require('../middlewares/validar-campos');
 
-/* ProductoSchema.methods.toJSON = function () {
-    const { __v, estado, ...data } = this.toObject();
-    return data;
-} */
+const router = Router();
 
-module.exports = model('Producto', ProductoSchema)
+router.get('/',obtenerProductos);
+
+router.get('/:id',[
+    check('id', 'No es un un ID válido').isMongoId(),
+    check('id').custom(existeProducto),
+    validarCampos
+] ,obtenerProducto);
+
+router.put('/:id', [
+//    validarJWT,
+    check('id', 'No es un un ID válido').isMongoId(),
+    check('id').custom(existeProducto),
+    validarCampos
+], actualizarProducto);
+
+router.post('/', [
+//    validarJWT,
+    check('codigo','El codigo es obligatorio').not().isEmpty(),
+    check('nombre','El nombre es obligatorio').not().isEmpty(),
+    check('marcaProducto','La marca producto es obligatorio').not().isEmpty(),
+    check('marcaProducto', 'No es un un ID válido').isMongoId(),
+    check('marcaProducto').custom(existeMarcaProducto),
+    check('marcaAuto','La marca auto es obligatorio').not().isEmpty(),
+    check('marcaAuto', 'No es un un ID válido').isMongoId(),
+    check('marcaAuto').custom(existeMarcaAuto),
+    check('categoria','La categoria es obligatorio').not().isEmpty(),
+    check('categoria', 'No es un un ID válido').isMongoId(),
+    check('categoria').custom(existeCategoria),
+    validarCampos
+], crearProducto);
+
+router.delete('/:id', [
+//    validarJWT,
+//    esAdminRole,
+    check('id', 'No es un un ID válido').isMongoId(),
+    check('id').custom(existeProducto),
+    validarCampos
+], borrarProducto);
+
+module.exports = router;

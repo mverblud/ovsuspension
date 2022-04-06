@@ -68,6 +68,15 @@ const actualizarMarcaProducto = async (req, res = response) => {
     const { estado, ...data } = req.body;
 
     if (data.nombre) {
+
+        //  Verifico si no existe la marca
+        const marcaProductoDB = await MarcaProducto.findOne({ nombre: data.nombre.toUpperCase() });
+        if (marcaProductoDB) {
+            return res.status(400).json({
+                msg: `La marca ${marcaProductoDB.nombre}, ya existe`
+            })
+        }
+
         data.nombre = data.nombre.toUpperCase();
     }
     

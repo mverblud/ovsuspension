@@ -2,6 +2,7 @@ const MarcaAuto  = require('../models/marcaAuto');
 const MarcaAutoModelo = require('../models/marcaAutoModelo');
 const MarcaProducto = require('../models/marcaProducto');
 const Categoria = require('../models/categoria');
+const Producto = require('../models/producto');
 
 const existeMarcaAuto = async (id = '') => {
 
@@ -43,9 +44,20 @@ const existeCategoria = async (id = '') => {
 
 }
 
+const existeProducto = async (id = '') => {
+    
+    const existeProducto = await Producto.findById({ _id:id });
+
+    if (!existeProducto) {
+        throw new Error(`El id no existe ${id}`);
+    }
+
+}
+
 module.exports = {
     existeMarcaAuto,
     existeMarcaAutoModelo,
     existeMarcaProducto,
-    existeCategoria
+    existeCategoria,
+    existeProducto
 }
