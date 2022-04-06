@@ -10,7 +10,7 @@ class Server {
         this.port = process.env.PORT;
         this.path = {
             auth: '/api/auth',
-            buscar: '/api/buscar',
+            categorias: '/api/categorias',
             marcaProductos: '/api/marcaProductos',
             marcaAutos: '/api/marcaAutos',
             marcaAutosModelos: '/api/marcaAutoModelos',
@@ -52,10 +52,11 @@ class Server {
 
     routes() {
 
+        this.app.use(this.path.categorias, require('../routes/categorias'));
         this.app.use(this.path.marcaProductos, require('../routes/marcaProductos'));
         this.app.use(this.path.marcaAutos, require('../routes/marcaAutos'));
         this.app.use(this.path.marcaAutosModelos, require('../routes/marcaAutoModelos'));
-
+        
     }
 
     listen() {
