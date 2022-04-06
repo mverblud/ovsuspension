@@ -14,13 +14,6 @@ const MarcaProductoSchema = Schema({
         type: String,
         required: [true, 'El nombre es obligatorio'],
     },
-    fechaAlta:{
-        type: Date,
-        default: Date.now
-    },
-    fechaBaja:{
-        type: Date
-    },
     estado: {
         type: Boolean,
         required: [true],

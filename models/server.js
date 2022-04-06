@@ -12,8 +12,8 @@ class Server {
             auth: '/api/auth',
             buscar: '/api/buscar',
             marcaProductos: '/api/marcaProductos',
-            productos: '/api/productos',
-            usuarios: '/api/usuarios',
+            marcaAutos: '/api/marcaAutos',
+            marcaAutosModelos: '/api/marcaAutoModelos',
             uploads: '/api/uploads'
         }
 
@@ -52,8 +52,9 @@ class Server {
 
     routes() {
 
-        //    this.app.use(this.path.productos, require('../routes/productos'));
         this.app.use(this.path.marcaProductos, require('../routes/marcaProductos'));
+        this.app.use(this.path.marcaAutos, require('../routes/marcaAutos'));
+        this.app.use(this.path.marcaAutosModelos, require('../routes/marcaAutoModelos'));
 
     }
 
