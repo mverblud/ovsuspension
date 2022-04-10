@@ -161,7 +161,6 @@ const actualizarProducto = async (req, res = response) => {
         }
     }
 
-
     const producto = await Producto.findByIdAndUpdate(id, data, { new: true });
 
     res.json({ producto });

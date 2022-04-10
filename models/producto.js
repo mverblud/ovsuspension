@@ -4,7 +4,6 @@ const ProductoSchema = Schema({
     codigo: {
         type: String,
         required: [true, 'El codigo es obligatorio'],
-        unique: true,
     },
     nombre: {
         type: String,
