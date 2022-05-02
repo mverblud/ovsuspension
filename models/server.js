@@ -9,6 +9,7 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         this.path = {
+            buscar : '/api/buscar',
             productos: '/api/productos',
             categorias: '/api/categorias',
             marcaProductos: '/api/marcaProductos',
@@ -52,6 +53,7 @@ class Server {
 
     routes() {
 
+        this.app.use(this.path.buscar, require('../routes/buscar'));
         this.app.use(this.path.categorias, require('../routes/categorias'));
         this.app.use(this.path.productos, require('../routes/productos'));
         this.app.use(this.path.marcaProductos, require('../routes/marcaProductos'));

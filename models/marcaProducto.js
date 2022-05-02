@@ -12,7 +12,6 @@ const MarcaProductoSchema = Schema({
     },
     nombreCorto: {
         type: String,
-        required: [true, 'El nombre es obligatorio'],
     },
     estado: {
         type: Boolean,
