@@ -10,12 +10,14 @@ const cargarArchivo = async (req, res = response) => {
 
         //  Subo Archivo csv
         const uploadPath = await subirArchivo(req.files, undefined, 'lista');
+
         //  obtengo resultado de la lectura
         const { productos, marcaProductos, marcaAutos, categorias } = await leerLista(uploadPath);
+
         //  impacto marcaProductos, marcaAutos, Categorias
         const { marcasIds, categoriasIds, marcaProductosIds } = await impactarLista(marcaProductos, marcaAutos, categorias);
-    
-        const { ok } = await impactarProductos(productos,marcasIds, categoriasIds, marcaProductosIds);
+
+        const { ok } = await impactarProductos(productos, marcasIds, categoriasIds, marcaProductosIds);
 
         if (ok) {
             res.json({
@@ -23,8 +25,8 @@ const cargarArchivo = async (req, res = response) => {
                 productos: productos.length,
                 marcaAutos: marcaAutos.length,
                 categorias: categorias.length,
-            });            
-        }else{
+            });
+        } else {
             res.status(400).json({
                 msg: 'No se pudo procesar el archivo.'
             });

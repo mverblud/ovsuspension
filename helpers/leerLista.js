@@ -34,11 +34,11 @@ const leerLista = (nombreArch) => {
                 }
 
                 const producto = {
-                    codigo: data.codigo.toUpperCase().trim(),
+                    codigo:         data.codigo.toUpperCase().trim(),
                     marcaProducto : data.marcaProducto.toUpperCase().trim(),
-                    marcaAuto: data.marcaAuto.toUpperCase().trim(),
-                    categoria: data.categoria.toUpperCase().trim(),
-                    nombre: data.nombre.toUpperCase().trim(),
+                    marcaAuto:      data.marcaAuto.toUpperCase().trim(),
+                    categoria:      data.categoria.toUpperCase().trim(),
+                    nombre:         data.nombre.toUpperCase().trim(),
                 }
 
                 productos.push(producto);

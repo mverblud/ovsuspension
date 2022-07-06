@@ -59,23 +59,81 @@ const buscarMarcaProductos = async (termino = '', res = response) => {
     })
 }
 
-const buscarProductos = async (termino = '', res = response) => {
+const buscarProductos = async (termino = '', req, res = response) => {
 
+    let producto = [];
+    let filter = {};
+    const regex = new RegExp(termino, 'i');
+    const { limite = 10, desde = 0, categoria, marcaAuto, marcaProducto } = req.query;
+
+    //  Busqueda por _id mongo
     const esMongoID = ObjectId.isValid(termino);
-
     if (esMongoID) {
-        const producto = await Producto.findById(termino).populate('categoria', 'nombre');
+        producto = await Producto.findById(termino)
+            .populate('categoria', 'nombre')
+            .populate('marcaAuto', 'nombre')
+            .populate('marcaProducto', 'nombre');
+
         return res.json({
             results: (producto) ? [producto] : []
         })
     }
 
-    const regex = new RegExp(termino, 'i')
+    /*     if (categoria !== undefined) {
+            const esMongoID = ObjectId.isValid(categoria);
+            if (esMongoID) {
+    
+            }
+        }
+    
+        if (marcaAuto !== undefined) {
+            const esMongoID = ObjectId.isValid(marcaAuto);
+            if (esMongoID) {
+    
+            }
+        }
+    
+        if (marcaProducto !== undefined) {
+            const esMongoID = ObjectId.isValid(marcaProducto);
+            if (esMongoID) {
+            }
+        } */
 
-    const productos = await Producto.find({ nombre: regex, estado: true }).populate('categoria', 'nombre');
+    /*     
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaAuto: marcaAuto }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaProducto: marcaProducto }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaAuto: marcaAuto }] }] };
+        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }] };
+
+        filter = { $and: [{ estado: true }, { categoria: categoria }] }
+        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }] }
+        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaAuto: marcaAuto }] }
+        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }
+
+        filter = { $and: [{ estado: true }, { marcaProducto: marcaProducto }] }
+        filter = { $and: [{ estado: true }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }
+        filter = { $and: [{ estado: true }, { marcaAuto: marcaAuto }] }
+     */
+
+    const [total, productos] = await Promise.all([
+        Producto.countDocuments(filter),
+        Producto.find(filter)
+            .populate('categoria', 'nombre')
+            .populate('marcaAuto', 'nombre')
+            .populate('marcaProducto', 'nombre')
+            .skip(Number(desde))
+            .limit(Number(limite))
+    ])
 
     res.json({
-        results: productos
+        results: {
+            total,
+            productos
+        }
     })
 }
 
@@ -121,7 +179,7 @@ const buscar = (req, res = response) => {
             buscarCategorias(termino, res);
             break;
         case 'productos':
-            buscarProductos(termino, res);
+            buscarProductos(termino, req, res);
             break;
 
         default:
