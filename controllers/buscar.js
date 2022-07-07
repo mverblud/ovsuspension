@@ -59,65 +59,76 @@ const buscarMarcaProductos = async (termino = '', res = response) => {
     })
 }
 
-const buscarProductos = async (termino = '', req, res = response) => {
+const buscarProductos = async (termino = undefined, req, res = response) => {
 
-    let producto = [];
+    // paginado y filtro
     let filter = {};
-    const regex = new RegExp(termino, 'i');
     const { limite = 10, desde = 0, categoria, marcaAuto, marcaProducto } = req.query;
 
-    //  Busqueda por _id mongo
-    const esMongoID = ObjectId.isValid(termino);
-    if (esMongoID) {
-        producto = await Producto.findById(termino)
-            .populate('categoria', 'nombre')
-            .populate('marcaAuto', 'nombre')
-            .populate('marcaProducto', 'nombre');
+    if (termino !== undefined) {
 
-        return res.json({
-            results: (producto) ? [producto] : []
-        })
-    }
-
-    /*     if (categoria !== undefined) {
-            const esMongoID = ObjectId.isValid(categoria);
-            if (esMongoID) {
-    
-            }
-        }
-    
-        if (marcaAuto !== undefined) {
-            const esMongoID = ObjectId.isValid(marcaAuto);
-            if (esMongoID) {
-    
-            }
-        }
-    
-        if (marcaProducto !== undefined) {
-            const esMongoID = ObjectId.isValid(marcaProducto);
-            if (esMongoID) {
-            }
-        } */
-
-    /*     
+    //  Expresion regular
+        const regex = new RegExp(termino, 'i');
         filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaAuto: marcaAuto }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaProducto: marcaProducto }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaAuto: marcaAuto }] }] };
-        filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }] };
+        switch (true) {
+            case ((categoria !== undefined) && (marcaProducto !== undefined) && (marcaAuto !== undefined)):
+                filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }] };
+                break;
 
-        filter = { $and: [{ estado: true }, { categoria: categoria }] }
-        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }] }
-        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaAuto: marcaAuto }] }
-        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }
+            case (categoria !== undefined):
+                filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }] }] };
+                if (marcaProducto !== undefined) {
+                    filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }] }] };
+                }
+                if (marcaAuto !== undefined) {
+                    filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { categoria: categoria }, { marcaAuto: marcaAuto }] }] };
+                }
+                break;
 
-        filter = { $and: [{ estado: true }, { marcaProducto: marcaProducto }] }
-        filter = { $and: [{ estado: true }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }
-        filter = { $and: [{ estado: true }, { marcaAuto: marcaAuto }] }
-     */
+            case (marcaProducto !== undefined):
+                filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaProducto: marcaProducto }] }] };
+                if (marcaAuto !== undefined) {
+                    filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }] };
+                }
+                break;
+
+            case (marcaAuto !== undefined):
+                filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }, { marcaAuto: marcaAuto }] }] };
+                break;
+        }
+
+    } else {
+        switch (true) {
+            case (categoria !== undefined):
+                filter = { $and: [{ estado: true }, { categoria: categoria }] };
+                switch (true) {
+                    case ((marcaProducto !== undefined) && (marcaAuto !== undefined)):
+                        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] };
+                        break;
+
+                    case (marcaProducto !== undefined):
+                        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaProducto: marcaProducto }] };
+                        break;
+
+                    case (marcaAuto !== undefined):
+                        filter = { $and: [{ estado: true }, { categoria: categoria }, { marcaAuto: marcaAuto }] };
+                        break;
+                }
+
+                break;
+
+            case (marcaProducto !== undefined):
+                filter = { $and: [{ estado: true }, { marcaProducto: marcaProducto }] }
+                if (marcaAuto !== undefined) {
+                    filter = { $and: [{ estado: true }, { marcaProducto: marcaProducto }, { marcaAuto: marcaAuto }] }
+                }
+                break;
+
+            case (marcaAuto !== undefined):
+                filter = { $and: [{ estado: true }, { marcaAuto: marcaAuto }] };
+                break;
+        }
+    }
 
     const [total, productos] = await Promise.all([
         Producto.countDocuments(filter),
@@ -132,9 +143,10 @@ const buscarProductos = async (termino = '', req, res = response) => {
     res.json({
         results: {
             total,
-            productos
+            productos,
         }
     })
+
 }
 
 const buscarCategorias = async (termino = '', res = response) => {
@@ -160,7 +172,8 @@ const buscarCategorias = async (termino = '', res = response) => {
 
 const buscar = (req, res = response) => {
 
-    const { coleccion, termino } = req.params;
+    const { coleccion } = req.params;
+    const { termino } = req.query;
 
     if (!coleccionesPermitidas.includes(coleccion)) {
         return res.status(400).json({
