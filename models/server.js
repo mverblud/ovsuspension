@@ -9,13 +9,15 @@ class Server {
         this.app = express();
         this.port = process.env.PORT;
         this.path = {
-            buscar : '/api/buscar',
-            productos: '/api/productos',
-            categorias: '/api/categorias',
-            marcaProductos: '/api/marcaProductos',
-            marcaAutos: '/api/marcaAutos',
+            auth:              '/api/auth',
+            buscar :           '/api/buscar',
+            productos:         '/api/productos',
+            categorias:        '/api/categorias',
+            marcaProductos:    '/api/marcaProductos',
+            marcaAutos:        '/api/marcaAutos',
             marcaAutosModelos: '/api/marcaAutoModelos',
-            uploads: '/api/uploads'
+            usuarios:          '/api/usuarios',
+            uploads:           '/api/uploads'
         }
 
         // Conectar a base de datos
@@ -43,6 +45,9 @@ class Server {
         // Directorio publico
         this.app.use(express.static('public'));
 
+        // Directorio publico
+        this.app.use(express.static('public'));
+
         // Fileupload - Carga de Archivos
         this.app.use(fileUpload({
             useTempFiles: true,
@@ -53,12 +58,14 @@ class Server {
 
     routes() {
 
+        this.app.use(this.path.auth, require('../routes/auth'));
         this.app.use(this.path.buscar, require('../routes/buscar'));
         this.app.use(this.path.categorias, require('../routes/categorias'));
         this.app.use(this.path.productos, require('../routes/productos'));
         this.app.use(this.path.marcaProductos, require('../routes/marcaProductos'));
         this.app.use(this.path.marcaAutos, require('../routes/marcaAutos'));
         this.app.use(this.path.marcaAutosModelos, require('../routes/marcaAutoModelos'));
+        this.app.use(this.path.usuarios, require('../routes/usuarios'));
         this.app.use(this.path.uploads, require('../routes/uploads'));
 
     }

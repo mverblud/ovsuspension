@@ -2,7 +2,12 @@ const { Router } = require('express');
 const { check } = require('express-validator');
 const { crearMarcaAutoModelo, obtenerMarcaAutoModelos, obtenerMarcaAutoModelo, actualizarMarcaAutoModelo, borrarMarcaAutoModelo } = require('../controllers/marcaAutoModelos');
 const { existeMarcaAuto, existeMarcaAutoModelo } = require('../helpers/db-validators');
-const { validarCampos } = require('../middlewares/validar-campos');
+
+const {
+    validarCampos,
+    validarJWT,
+    esAdminRole,
+} = require('../middlewares')
 
 const router = Router();
 
@@ -23,7 +28,7 @@ router.post('/', [
 ], crearMarcaAutoModelo);
 
 router.put('/:id', [
-//    validarJWT,
+    validarJWT,
     check('nombre','El nombre es obligatorio').not().isEmpty(),
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaAutoModelo),
@@ -31,8 +36,8 @@ router.put('/:id', [
 ], actualizarMarcaAutoModelo);
 
 router.delete('/:id', [
-//    validarJWT,
-//    esAdminRole,
+    validarJWT,
+    esAdminRole,
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaAutoModelo),
     validarCampos

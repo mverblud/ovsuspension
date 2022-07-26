@@ -1,0 +1,232 @@
+.menuNavegacion a:hover {
+    background: #FDB904;
+    border-radius: 5px; }
+  
+  .bg-img-hero {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: top center; }
+  
+  .min-h-450rem {
+    min-height: 80rem; }
+  
+  .lineaTitulo {
+    height: 8px;
+    width: 80px;
+    background-color: #FDB904;
+    display: table;
+    margin-top: 10px; }
+  
+  @keyframes aparecer {
+    0% {
+      opacity: 0; }
+    100% {
+      opacity: 1; } }
+  
+  .card-amortiguador {
+    background-image: url("../imagenes/Productos/Amortiguador.jpg");
+    background-size: cover; }
+  
+  .card-precap {
+    background-image: url("../imagenes/Productos/precap.jpg");
+    background-size: cover; }
+  
+  .card-bieleta {
+    background-image: url("../imagenes/Productos/bieletas.jpg");
+    background-size: cover; }
+  
+  .card-buje {
+    background-image: url("../imagenes/Productos/buje.jpg");
+    background-size: cover; }
+  
+  .card-cajaDirrecion {
+    background-image: url("../imagenes/Productos/cajaDirrecion.jpg");
+    background-size: cover; }
+  
+  .card-cazoleta {
+    background-image: url("../imagenes/Productos/cazoletas.jpg");
+    background-size: cover; }
+  
+  .card-extremo {
+    background-image: url("../imagenes/Productos/extremos.jpg");
+    background-size: cover; }
+  
+  .card-fuelle {
+    background-image: url("../imagenes/Productos/fuelles.jpg");
+    background-size: cover; }
+  
+  .card-resortes {
+    background-image: url("../imagenes/Productos/Resortes.jpg");
+    background-size: cover; }
+  
+  .card-rotulas {
+    background-image: url("../imagenes/Productos/rotulas.jpg");
+    background-size: cover; }
+  
+  .card div h2 {
+    color: #185ADB; }
+  
+  .iconoRedes {
+    padding-right: 10px;
+    font-size: 5rem;
+    color: #FDB904; }
+    .iconoRedes i:hover {
+      color: black; }
+  
+  .iframe {
+    width: 100%;
+    height: 100%; }
+  
+  @media only screen and (min-width: 100px) and (max-width: 425px) {
+    .iconoRedes {
+      font-size: 2.5rem; } }
+  
+  @media only screen and (min-width: 425px) and (max-width: 768px) {
+    .iconoRedes {
+      font-size: 3.33333rem; } }
+  
+  @media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .iconoRedes {
+      font-size: 5rem; } }
+  
+  body {
+    font-family: "Roboto", sans-serif;
+    font-weight: normal; }
+  
+  footer {
+    background-color: black; }
+  
+  .imgFooter {
+    width: 200px;
+    height: 60px; }
+  
+  .ulInfo {
+    font-size: 1.2rem; }
+  
+  .ulSocialFooter {
+    list-style: none; }
+    .ulSocialFooter i {
+      padding-right: 10px;
+      color: white;
+      font-size: 2.5rem; }
+    .ulSocialFooter i:hover {
+      color: #FDB904; }
+  
+  @media only screen and (max-width: 560px) {
+    .imgFooter {
+      width: 133.33333px;
+      height: 40px; }
+    .ulInfo {
+      font-size: 0.9rem; }
+    footer .ulSocialFooter i {
+      font-size: 1.66667rem; } }
+  
+  body {
+    font-family: "Roboto", sans-serif;
+    font-weight: normal; }
+  
+  /* CUSTOMIZE THE CAROUSEL
+  -------------------------------------------------- */
+  .carousel-caption {
+    bottom: 3rem;
+    z-index: 10; }
+  
+  .carousel-item {
+    height: 30rem; }
+  
+  .carousel-item > img {
+    position: absolute;
+    top: 0;
+    left: 0; }
+  
+  /* --- MEDIAQUERIES ---  */
+  @media screen and (max-width: 576px) {
+    .carousel-item {
+      height: 15rem; }
+    .carousel-item > img {
+      min-width: 100%;
+      height: 15rem; } }
+  
+  @media only screen and (min-width: 576px) and (max-width: 768px) {
+    .carousel-item {
+      height: 20rem; }
+    .carousel-item > img {
+      min-width: 100%;
+      height: 20rem; } }
+  
+  @media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .carousel-item {
+      height: 25rem; }
+    .carousel-item > img {
+      min-width: 100%;
+      height: 25rem; } }
+  
+  .card-amortiguador {
+    background-image: url("../imagenes/Productos/Amortiguador.jpg");
+    background-size: cover; }
+  
+  .card-precap {
+    background-image: url("../imagenes/Productos/precap.jpg");
+    background-size: cover; }
+  
+  .card-bieleta {
+    background-image: url("../imagenes/Productos/bieletas.jpg");
+    background-size: cover; }
+  
+  .card-buje {
+    background-image: url("../imagenes/Productos/bujes.jpg");
+    background-size: cover; }
+  
+  .card-cajaDirrecion {
+    background-image: url("../imagenes/Productos/cajaDirrecion.jpg");
+    background-size: cover; }
+  
+  .card-cazoleta {
+    background-image: url("../imagenes/Productos/cazoletas.jpg");
+    background-size: cover; }
+  
+  .card-extremo {
+    background-image: url("../imagenes/Productos/extremos.jpg");
+    background-size: cover; }
+  
+  .card-fuelle {
+    background-image: url("../imagenes/Productos/fuelles.jpg");
+    background-size: cover; }
+  
+  .card-resortes {
+    background-image: url("../imagenes/Productos/Resortes.jpg");
+    background-size: cover; }
+  
+  .card-rotulas {
+    background-image: url("../imagenes/Productos/rotulas.jpg");
+    background-size: cover; }
+  
+  .card div h2 {
+    color: #185ADB; }
+  
+  /* Curso Javascript*/
+  
+  .canasta {
+    min-width: 500px;
+    max-width: 500px;
+    border-left: 1px solid #ececec;
+    text-align: center;
+    padding: 20px 0 0 0;
+    background-color: #efefef;
+    position: fixed;
+    right: -500px;
+    top: 0;
+    bottom: 0;
+    transition: .3s;
+  }
+  
+  .canasta.on {
+    right: 0;
+  }
+  
+  .boton-canasta {
+    right: 10px;
+    top: 20px;
+    z-index: 2;
+    cursor: pointer;
+  }
