@@ -12,6 +12,7 @@ const obtenerMarcaProductos = async (req = request, res = response) => {
         MarcaProducto.find(query)
             .skip(Number(desde))
             .limit(Number(limite))
+            .sort({ nombre: 1 })
     ])
 
     res.json({

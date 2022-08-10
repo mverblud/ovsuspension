@@ -13,6 +13,7 @@ const obtenerMarcaAutos = async (req = request, res = response) => {
             .populate('marcaAutoModelo','nombre')
             .skip(Number(desde))
             .limit(Number(limite))
+            .sort({ nombre: 1 })
     ]);
 
     res.json({

@@ -12,6 +12,7 @@ const obtenerCategorias = async (req = request, res = response) => {
         Categoria.find(query)
             .skip(Number(desde))
             .limit(Number(limite))
+            .sort({ nombre: 1 })
     ]);
 
     res.json({
@@ -33,10 +34,10 @@ const crearCategoria = async (req, res = response) => {
 
     try {
 
-    //  Guardo nombre siempre en mayuscula
+        //  Guardo nombre siempre en mayuscula
         const nombre = req.body.nombre.toUpperCase();
 
-    //  Verifico si no existe la marca
+        //  Verifico si no existe la marca
         const categoriaDB = await Categoria.findOne({ nombre });
         if (categoriaDB) {
             return res.status(400).json({

@@ -8,13 +8,11 @@ const cargarArchivo = async (req, res = response) => {
 
     try {
 
-        //  Subo Archivo csv
+    //  Subo Archivo csv
         const uploadPath = await subirArchivo(req.files, undefined, 'lista');
-
-        //  obtengo resultado de la lectura
+    //  obtengo resultado de la lectura
         const { productos, marcaProductos, marcaAutos, categorias } = await leerLista(uploadPath);
-
-        //  impacto marcaProductos, marcaAutos, Categorias
+    //  impacto marcaProductos, marcaAutos, Categorias
         const { marcasIds, categoriasIds, marcaProductosIds } = await impactarLista(marcaProductos, marcaAutos, categorias);
 
         const { ok } = await impactarProductos(productos, marcasIds, categoriasIds, marcaProductosIds);
@@ -25,6 +23,7 @@ const cargarArchivo = async (req, res = response) => {
                 productos: productos.length,
                 marcaAutos: marcaAutos.length,
                 categorias: categorias.length,
+                marcaProductos : marcaProductos.length
             });
         } else {
             res.status(400).json({

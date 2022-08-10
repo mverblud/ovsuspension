@@ -101,17 +101,9 @@ const impactarProductos = async (productos = [], marcasIds = [], categoriasIds =
             const productoDB = await Producto.findOne({ codigo });
             if (!productoDB) {
 
-                if (codigo === '35717G-COR') {
-                    console.log(codigo, '-', marcaProducto, '-', marcaAuto, '-', categoria, '-', nombre);
-                }
-
                 const marcaProductoId = await obtengoMarcaProductoId(marcaProductosIds, marcaProducto);
                 const marcaId         = await obtengoMarcaId(marcasIds, marcaAuto);
                 const CategoriaId     = await obtengoCategoriaId(categoriasIds, categoria);
-
-                if (codigo === '35717G-COR') {
-                    console.log(marcaProductoId, '-', marcaId, '-', CategoriaId);
-                }
 
                 const producto = new Producto({
                     codigo,
