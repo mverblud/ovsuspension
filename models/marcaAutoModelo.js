@@ -1,15 +1,17 @@
-const { Schema, model } = require('mongoose');
+import mongoose from 'mongoose';
 
-const MarcaAutoModeloSchema = Schema({
+const MarcaAutoModeloSchema = mongoose.Schema({
     nombre: {
         type: String,
         required: [true, 'El nombre es obligatorio'],
         unique: true,
+        trim : true,
+        uppercase : true
     },
-    marcaAuto: {
-        type: Schema.Types.ObjectId,
-        ref:'MarcaAuto',
-        required : true
+    estado: {
+        type: Boolean,
+        required: [true],
+        default: true,
     }
 });
 
@@ -18,4 +20,5 @@ MarcaAutoModeloSchema.methods.toJSON = function () {
     return marcaAutosModelo;
 }
 
-module.exports = model('MarcaAutoModelo', MarcaAutoModeloSchema)
+const MarcaAutosModelo = mongoose.model('MarcaAutoModelo', MarcaAutoModeloSchema);
+export default MarcaAutosModelo;

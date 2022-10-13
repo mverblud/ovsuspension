@@ -1,6 +1,4 @@
-const { response } = require("express")
-
-const esAdminRole = (req, res = response, next) => {
+const esAdminRole = (req, res, next) => {
 
     if (!req.usuario) {
         return res.status(500).json({
@@ -12,7 +10,7 @@ const esAdminRole = (req, res = response, next) => {
 
     if (rol != 'ADMIN_ROLE') {
         return res.status(401).json({
-            msg: `${nombre} no es administrador - no puede`
+            msg: `${nombre} no es administrador!`
         })
     } else {
 
@@ -23,7 +21,7 @@ const esAdminRole = (req, res = response, next) => {
 
 const tieneRole = (...roles) => {
 
-    return (req, res = response, next) => {
+    return (req, res, next) => {
 
         if (!req.usuario) {
             return res.status(500).json({
@@ -42,7 +40,7 @@ const tieneRole = (...roles) => {
 
 }
 
-module.exports = {
+export {
     esAdminRole,
     tieneRole
 }

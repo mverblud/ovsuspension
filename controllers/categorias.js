@@ -1,40 +1,49 @@
-const { response, request } = require('express');
+import Categoria from '../models/categoria.js'
 
-const Categoria = require('../models/categoria');
+const obtenerCategorias = async (req, res) => {
 
-const obtenerCategorias = async (req = request, res = response) => {
+    try {
+        const { limite = 50, desde = 0 } = req.query;
+        const query = { estado: true }
 
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { estado: true }
+        const [total, categorias] = await Promise.all([
+            Categoria.countDocuments(query),
+            Categoria.find(query)
+                .skip(Number(desde))
+                .limit(Number(limite))
+                .sort({ nombre: 1 })
+        ]);
 
-    const [total, categorias] = await Promise.all([
-        Categoria.countDocuments(query),
-        Categoria.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-            .sort({ nombre: 1 })
-    ]);
-
-    res.json({
-        total,
-        categorias
-    })
+        res.json({
+            total,
+            categorias
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener las categorias'
+        })
+    }
 
 }
 
 const obtenerCategoria = async (req = request, res = response) => {
-
-    const { id } = req.params;
-    const categoria = await Categoria.findById({ _id: id });
-    res.json({ categoria });
-
+    try {
+        const { id } = req.params;
+        const categoria = await Categoria.findById({ _id: id });
+        res.json({ categoria });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener la categoria'
+        })
+    }
 }
 
 const crearCategoria = async (req, res = response) => {
 
     try {
 
-        //  Guardo nombre siempre en mayuscula
         const nombre = req.body.nombre.toUpperCase();
 
         //  Verifico si no existe la marca
@@ -53,38 +62,45 @@ const crearCategoria = async (req, res = response) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({
-            msg: 'No se pudo actualizar la categoria'
+            msg: 'No se pudo crear la categoria'
         })
     }
 }
 
 const actualizarCategoria = async (req, res = response) => {
+    try {
+        const { id } = req.params;
+        const { nombre } = req.body;
 
-    const { id } = req.params;
-    const { estado, ...data } = req.body;
+        const categoria = await Categoria.findByIdAndUpdate(id, { nombre }, { new: true });
 
-    if (data.nombre) {
-        data.nombre = data.nombre.toUpperCase();
+        res.json({ categoria })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo actualizar la categoria'
+        })
     }
-
-    const categoria = await Categoria.findByIdAndUpdate(id, data, { new: true });
-
-    res.json({ categoria });
-
 }
 
 const borrarCategoria = async (req, res = response) => {
 
-    const { id } = req.params;
-    const categoria = await Categoria.findByIdAndUpdate(id, { estado: false });
+    try {
+        const { id } = req.params;
+        const categoria = await Categoria.findByIdAndUpdate(id, { estado: false });
 
-    res.json({
-        categoria,
-    })
-
+        res.json({
+            categoria,
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo borrar la categoria'
+        })
+    }
 }
 
-module.exports = {
+export {
     obtenerCategorias,
     obtenerCategoria,
     crearCategoria,

@@ -1,9 +1,19 @@
-const express = require('express');
-const cors = require('cors');
-const { dbConnection } = require('../database/config');
-const fileUpload = require('express-fileupload');
+import express    from "express";
+import cors       from "cors";
+import fileUpload from "express-fileupload";
 
-class Server {
+import dbConnection           from '../database/config.js';
+import authRoute              from '../routes/auth.js';
+import buscarRoute            from '../routes/buscar.js';
+import usuariosRoute          from '../routes/usuarios.js';
+import categoriasRoute        from '../routes/categorias.js';
+import marcaProductosRoute    from '../routes/marcaProductos.js';
+import marcaAutosRoute        from '../routes/marcaAutos.js';
+import marcaAutosModelosRoute from '../routes/marcaAutoModelos.js';
+import productosRoute         from '../routes/productos.js';
+import uploadsRouter          from '../routes/uploads.js';
+
+export default class Server {
 
     constructor() {
         this.app = express();
@@ -22,10 +32,8 @@ class Server {
 
         // Conectar a base de datos
         this.conectarDB();
-
         // Middlewares
         this.middlewares();
-
         // Rutas de mi aplicación
         this.routes();
     }
@@ -38,16 +46,11 @@ class Server {
 
         // CORS
         this.app.use(cors());
-
         // Lectura y Parseo
         this.app.use(express.json());
-
+        this.app.use(express.urlencoded({ extended: true }));
         // Directorio publico
         this.app.use(express.static('public'));
-
-        // Directorio publico
-        this.app.use(express.static('public'));
-
         // Fileupload - Carga de Archivos
         this.app.use(fileUpload({
             useTempFiles: true,
@@ -58,25 +61,23 @@ class Server {
 
     routes() {
 
-        this.app.use(this.path.auth, require('../routes/auth'));
-        this.app.use(this.path.buscar, require('../routes/buscar'));
-        this.app.use(this.path.categorias, require('../routes/categorias'));
-        this.app.use(this.path.productos, require('../routes/productos'));
-        this.app.use(this.path.marcaProductos, require('../routes/marcaProductos'));
-        this.app.use(this.path.marcaAutos, require('../routes/marcaAutos'));
-        this.app.use(this.path.marcaAutosModelos, require('../routes/marcaAutoModelos'));
-        this.app.use(this.path.usuarios, require('../routes/usuarios'));
-        this.app.use(this.path.uploads, require('../routes/uploads'));
+        this.app.use(this.path.auth, authRoute);
+        this.app.use(this.path.buscar, buscarRoute);
+        this.app.use(this.path.categorias, categoriasRoute);
+        this.app.use(this.path.productos, productosRoute);
+        this.app.use(this.path.marcaProductos, marcaProductosRoute);
+        this.app.use(this.path.marcaAutos, marcaAutosRoute);
+        this.app.use(this.path.marcaAutosModelos, marcaAutosModelosRoute);
+        this.app.use(this.path.usuarios, usuariosRoute);
+        this.app.use(this.path.uploads, uploadsRouter);
 
     }
 
     listen() {
 
         this.app.listen(this.port, () => {
-            console.log('Servidor corriendo en el puerto ', this.port);
+            console.log('Servidor corriendo en el puerto', this.port);
         })
     }
 
 }
-
-module.exports = Server;

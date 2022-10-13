@@ -1,43 +1,48 @@
-const { response, request } = require('express');
+import MarcaAutoModelo from '../models/marcaAutoModelo.js';
+import MarcaAuto from '../models/marcaAuto.js';
 
-const MarcaAutoModelo = require('../models/marcaAutoModelo');
-const MarcaAuto = require('../models/marcaAuto');
+const obtenerMarcaAutoModelos = async (req, res) => {
+    try {
+        const { limite = 50, desde = 0 } = req.query;
+        const query = { estado: true };
 
-const obtenerMarcaAutoModelos = async (req = request, res = response) => {
+        const [total, marcaAutoModelos] = await Promise.all([
+            MarcaAutoModelo.countDocuments(query),
+            MarcaAutoModelo.find(query)
+                .skip(Number(desde))
+                .limit(Number(limite))
+                .sort({ nombre: 1 })
+        ]);
 
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { estado: true }
+        res.json({
+            total,
+            marcaAutoModelos
+        });
 
-    const [total, marcaAutoModelos] = await Promise.all([
-        MarcaAutoModelo.countDocuments(query),
-        MarcaAutoModelo.find(query)
-            .populate('marcaAuto', 'nombre')
-            .skip(Number(desde))
-            .limit(Number(limite))
-            .sort({ nombre: 1 })
-    ])
-
-    res.json({
-        total,
-        marcaAutoModelos
-    })
-
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener marca auto modelo'
+        });
+    }
 }
 
 const obtenerMarcaAutoModelo = async (req = request, res = response) => {
-
-    const { id } = req.params;
-    const marcaAutoModelo = await MarcaAutoModelo.findById({ _id: id }).populate('marcaAuto', 'nombre');
-
-    res.json({ marcaAutoModelo })
-
+    try {
+        const { id } = req.params;
+        const marcaAutoModelo = await MarcaAutoModelo.findById({ _id: id });
+        res.json({ marcaAutoModelo });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener marca auto modelo'
+        });
+    }
 }
 
 const crearMarcaAutoModelo = async (req, res = response) => {
-
     try {
-        const { nombre, marcaAuto } = req.body;
-
+        const { nombre } = req.body;
         const marcaAutoModeloDB = await MarcaAutoModelo.findOne({ nombre: nombre.toUpperCase() });
 
         if (marcaAutoModeloDB) {
@@ -46,38 +51,32 @@ const crearMarcaAutoModelo = async (req, res = response) => {
             })
         }
 
-        const marcaAutoModelo = new MarcaAutoModelo({ nombre: nombre.toUpperCase(), marcaAuto });
-        // Guardar en BD
+        const marcaAutoModelo = new MarcaAutoModelo({ nombre });
         await marcaAutoModelo.save();
-
-        const marcaAutoAux = await MarcaAuto.findById(marcaAutoModelo.marcaAuto);
-        marcaAutoAux.marcaAutoModelo.push(marcaAutoModelo._id);
-
-        await MarcaAuto.updateOne({ _id: marcaAutoAux._id }, marcaAutoAux);
-
         res.status(201).json(marcaAutoModelo)
 
     } catch (error) {
         console.log(error);
         res.status(400).json({
-            msg: 'No se pudo actualizar la caterogia'
+            msg: 'No se pudo crear marca auto modelo'
         })
     }
 }
 
 const actualizarMarcaAutoModelo = async (req, res = response) => {
+    try {
+        const { id } = req.params;
+        const { nombre } = req.body;
 
-    const { id } = req.params;
-    const { estado, marcaAuto, ...data } = req.body;
+        const marcaAutoModelo = await MarcaAutoModelo.findByIdAndUpdate(id, { nombre }, { new: true });
+        res.json({ marcaAutoModelo });
 
-    if (data.nombre) {
-        data.nombre = data.nombre.toUpperCase();
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo actualizar marca auto modelo'
+        })
     }
-
-    const marcaAutoModelo = await MarcaAutoModelo.findByIdAndUpdate(id, data, { new: true }).populate('marcaAuto', 'nombre');
-
-    res.json({ marcaAutoModelo });
-
 }
 
 const borrarMarcaAutoModelo = async (req, res = response) => {
@@ -88,10 +87,9 @@ const borrarMarcaAutoModelo = async (req, res = response) => {
     res.json({
         marcaAutoModelo,
     })
-
 }
 
-module.exports = {
+export {
     obtenerMarcaAutoModelos,
     obtenerMarcaAutoModelo,
     crearMarcaAutoModelo,

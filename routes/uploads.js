@@ -1,10 +1,15 @@
-const { Router } = require('express');
+import { Router } from "express";
 
-const { cargarArchivo } = require('../controllers/uploads');
-const { validarArchivoSubir } = require('../middlewares/validar-archivo');
+import { cargarArchivo } from '../controllers/uploads.js';
+import { validarArchivoSubir } from '../middlewares/validar-archivo.js';
+import validarJWT from "../middlewares/validarJWT.js";
+import { esAdminRole } from '../middlewares/validar-roles.js';
 
 const router = Router();
 
-router.post('/', validarArchivoSubir, cargarArchivo);
+router.post('/', [validarJWT,
+    esAdminRole,
+    validarArchivoSubir
+], cargarArchivo);
 
-module.exports = router;
+export default router;

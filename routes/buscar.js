@@ -1,8 +1,10 @@
-const { Router } = require('express');
-const { buscar } = require('../controllers/buscar');
+import { Router } from "express";
+import { buscar } from '../controllers/buscar.js';
+import validarJWT from "../middlewares/validarJWT.js";
+
 
 const router = Router();
 
-router.get('/:coleccion/', buscar)
+router.get('/:coleccion/', validarJWT, buscar)
 
-module.exports = router;
+export default router;

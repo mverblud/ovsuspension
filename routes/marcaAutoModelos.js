@@ -1,35 +1,35 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
-const { crearMarcaAutoModelo, obtenerMarcaAutoModelos, obtenerMarcaAutoModelo, actualizarMarcaAutoModelo, borrarMarcaAutoModelo } = require('../controllers/marcaAutoModelos');
-const { existeMarcaAuto, existeMarcaAutoModelo } = require('../helpers/db-validators');
+import { Router } from "express";
+import { check }  from "express-validator";
 
-const {
-    validarCampos,
-    validarJWT,
-    esAdminRole,
-} = require('../middlewares')
+import validarCampos from "../middlewares/validar-campos.js";
+import validarJWT    from "../middlewares/validarJWT.js";
+
+import { crearMarcaAutoModelo, obtenerMarcaAutoModelos, obtenerMarcaAutoModelo, actualizarMarcaAutoModelo, borrarMarcaAutoModelo } from '../controllers/marcaAutoModelos.js';
+import { existeMarcaAuto, existeMarcaAutoModelo } from '../helpers/db-validators.js';
+import { esAdminRole } from '../middlewares/validar-roles.js';
 
 const router = Router();
 
-router.get('/', obtenerMarcaAutoModelos);
+router.get('/', validarJWT, obtenerMarcaAutoModelos);
 
 router.get('/:id', [
+    validarJWT,
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaAutoModelo),
     validarCampos
 ], obtenerMarcaAutoModelo);
 
 router.post('/', [
+    validarJWT,
+    esAdminRole,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    check('marcaAuto','La marca del auto es obligatorio').not().isEmpty(),
-    check('marcaAuto', 'No es un un ID válido').isMongoId(),
-    check('marcaAuto').custom(existeMarcaAuto),
     validarCampos
 ], crearMarcaAutoModelo);
 
 router.put('/:id', [
     validarJWT,
-    check('nombre','El nombre es obligatorio').not().isEmpty(),
+    esAdminRole,
+    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaAutoModelo),
     validarCampos
@@ -43,4 +43,4 @@ router.delete('/:id', [
     validarCampos
 ], borrarMarcaAutoModelo);
 
-module.exports = router;
+export default router;

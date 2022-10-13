@@ -1,38 +1,49 @@
-const MarcaAuto = require("../models/marcaAuto");
-const MarcaProducto = require("../models/marcaProducto");
-const Categoria = require("../models/categoria");
-const Producto = require("../models/producto");
+import MarcaAuto from "../models/marcaAuto.js";
+import MarcaProducto from "../models/marcaProducto.js";
+import Categoria from "../models/categoria.js";
+import Producto from "../models/producto.js";
 
-const impactarLista = async (marcaProductos = [], marcaAutos = [], categorias = []) => {
+const impactarLista = async (marcaProductos = [], marcaAutos = [], categorias = [], productos = []) => {
 
-    const marcasIds = await Promise.all(
-        marcaAutos.map(async (marca) => {
+    const [marcasIds, categoriasIds, marcaProductosIds] = await Promise.all([
+        obtengoMarcaAuto(marcaAutos),
+        obtengoCategoria(categorias),
+        obtengoMarcaProductos(marcaProductos)
+    ]);
 
-            try {
-                let id = ''
-                const nombre = marca;
+    await completoProductos(productos, categoriasIds, marcasIds, marcaProductosIds);
+    return productos;
+}
 
-                //  Verifico si no existe la marca la guardo en BD
-                const marcaAutoDB = await MarcaAuto.findOne({ nombre });
-                if (!marcaAutoDB) {
-                    const marcaAuto = new MarcaAuto({ nombre });
-                    await marcaAuto.save();
-                    id = marcaAuto._id;
-                } else {
-                    id = marcaAutoDB._id;
-                }
+const obtengoMarcaAuto = async (marcaAutos) => {
+    const marcasIds = await Promise.all(marcaAutos.map(async (marca) => {
+        try {
+            let id = ''
+            const nombre = marca;
 
-                return {
-                    nombre,
-                    id
-                }
-            } catch (error) {
-                console.log(error)
+            //  Verifico si no existe la marca la guardo en BD
+            const marcaAutoDB = await MarcaAuto.findOne({ nombre });
+            if (!marcaAutoDB) {
+                const marcaAuto = new MarcaAuto({ nombre });
+                await marcaAuto.save();
+                id = marcaAuto._id;
+            } else {
+                id = marcaAutoDB._id;
             }
-        }));
 
+            return {
+                nombre,
+                id
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }));
+    return marcasIds;
+};
+
+const obtengoCategoria = async (categorias) => {
     const categoriasIds = await Promise.all(
-
         categorias.map(async (categoria) => {
             try {
                 let id = ''
@@ -56,7 +67,10 @@ const impactarLista = async (marcaProductos = [], marcaAutos = [], categorias = 
                 console.log(error)
             }
         }));
+    return categoriasIds;
+}
 
+const obtengoMarcaProductos = async (marcaProductos) => {
     const marcaProductosIds = await Promise.all(
 
         marcaProductos.map(async (marcaProducto) => {
@@ -82,75 +96,69 @@ const impactarLista = async (marcaProductos = [], marcaAutos = [], categorias = 
                 console.log(error)
             }
         }));
-
-    return {
-        marcasIds,
-        marcaProductosIds,
-        categoriasIds
-    }
-
+    return marcaProductosIds;
 }
 
-const impactarProductos = async (productos = [], marcasIds = [], categoriasIds = [], marcaProductosIds = []) => {
+const completoProductos = async (productos, categoriasIds, marcasIds, marcaProductosIds) => {
+
+    /*     categoriasIds.map(categoria => {
+            console.log(categoria.nombre);
+        }) */
+
+    categoriasIds.forEach(categoria => {
+        productos.forEach(producto => {
+            if (producto.categoria === categoria.nombre) {
+                producto.categoriaId = categoria.id
+            }
+        })
+    });
+
+    marcasIds.forEach(marca => {
+        productos.forEach(producto => {
+            if (producto.marcaAuto === marca.nombre) {
+                producto.marcaAutoId = marca.id;
+            }
+        })
+    });
+
+    marcaProductosIds.forEach(marcaP => {
+        productos.forEach(producto => {
+            if (producto.marcaProducto === marcaP.nombre) {
+                producto.marcaProductoId = marcaP.id;
+            }
+        })
+    });
+
+    //return productos;
+}
+
+const impactarProductos = async (productos = []) => {
 
     await Promise.all(productos.map(async (producto) => {
 
         try {
-
-            let { codigo, marcaProducto, marcaAuto, categoria, nombre } = producto;
+            let { codigo, marcaProductoId, marcaAutoId, categoriaId, nombre } = producto;
             const productoDB = await Producto.findOne({ codigo });
             if (!productoDB) {
-
-                const marcaProductoId = await obtengoMarcaProductoId(marcaProductosIds, marcaProducto);
-                const marcaId         = await obtengoMarcaId(marcasIds, marcaAuto);
-                const CategoriaId     = await obtengoCategoriaId(categoriasIds, categoria);
-
                 const producto = new Producto({
                     codigo,
                     nombre,
-                    marcaAuto: marcaId.id,
-                    marcaProducto: marcaProductoId.id,
-                    categoria: CategoriaId.id
+                    marcaAuto: marcaAutoId,
+                    marcaProducto: marcaProductoId,
+                    categoria: categoriaId
                 });
 
                 // Guardar en BD
                 await producto.save();
-            }
+            } 
         } catch (error) {
-            ok: false
+            console.log('impactarProductos', error);
         }
 
-    }))
-
-    return {
-        ok: true,
-    }
-
+    }));
 }
 
-const obtengoMarcaProductoId = async (marcaProductosIds, marcaAuto) => {
-
-    const marcaProductoId = marcaProductosIds.find(marcaP => marcaP.nombre === marcaAuto);
-
-    return marcaProductoId;
-}
-
-const obtengoMarcaId = async (marcasIds, marcaAuto) => {
-
-    const marcaId = marcasIds.find(marca => marca.nombre === marcaAuto);
-
-    return marcaId;
-}
-
-const obtengoCategoriaId = async (categoriasIds, categoriaNombre) => {
-
-    const CategoriaId = categoriasIds.find(categoria => categoria.nombre === categoriaNombre);
-
-    return CategoriaId;
-}
-
-
-module.exports = {
+export {
     impactarLista,
     impactarProductos
 }

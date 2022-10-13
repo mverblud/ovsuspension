@@ -1,38 +1,46 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
-const { crearMarcaProducto, obtenerMarcaProductos, obtenerMarcaProducto, actualizarMarcaProducto, borrarMarcaProducto } = require('../controllers/marcaProductos');
-const { existeMarcaProducto } = require('../helpers/db-validators');
-const { validarCampos } = require('../middlewares/validar-campos');
+import { Router } from "express";
+import { check }  from "express-validator";
+
+import validarCampos from "../middlewares/validar-campos.js";
+import validarJWT    from "../middlewares/validarJWT.js";
+
+import { crearMarcaProducto, obtenerMarcaProductos, obtenerMarcaProducto, actualizarMarcaProducto, borrarMarcaProducto } from '../controllers/marcaProductos.js';
+import { existeMarcaProducto } from '../helpers/db-validators.js';
+import { esAdminRole }         from '../middlewares/validar-roles.js';
 
 const router = Router();
 
-router.get('/', obtenerMarcaProductos);
+router.get('/',validarJWT, obtenerMarcaProductos);
 
 router.get('/:id', [
+    validarJWT,
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaProducto),
     validarCampos
 ], obtenerMarcaProducto);
 
 router.post('/', [
+    validarJWT,
+    esAdminRole,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('nombreCorto', 'El nombre corto es obligatorio').not().isEmpty(),
     validarCampos
 ], crearMarcaProducto);
 
 router.put('/:id', [
-//    validarJWT,
+    validarJWT,
+    esAdminRole,
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaProducto),
     validarCampos
 ], actualizarMarcaProducto);
 
 router.delete('/:id', [
-//    validarJWT,
-//    esAdminRole,
+    validarJWT,
+    esAdminRole,
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeMarcaProducto),
     validarCampos
 ], borrarMarcaProducto); 
 
-module.exports = router;
+export default router;

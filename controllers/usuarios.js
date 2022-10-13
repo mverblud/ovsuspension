@@ -1,45 +1,50 @@
-const { response, request } = require('express');
-const bcrypt = require('bcryptjs');
-
-const Usuario = require('../models/usuario');
+import Usuario from '../models/usuario.js';
+import emailRegistro from '../helpers/emailRegistro.js';
 
 const usuarioGet = async (req = request, res = response) => {
 
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { estado: true }
-
-    const [total, usuarios] = await Promise.all([
-        Usuario.countDocuments(query),
-        Usuario.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-    ])
-
-    res.json({
-        total,
-        usuarios
-    })
-
+    try {
+        const { limite = 50, desde = 0 } = req.query;
+        const query = { estado: true }
+    
+        const [total, usuarios] = await Promise.all([
+            Usuario.countDocuments(query),
+            Usuario.find(query)
+                .skip(Number(desde))
+                .limit(Number(limite))
+        ])
+    
+        res.json({
+            total,
+            usuarios
+        })        
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener los usuario'
+        })        
+    }
 }
 
 const usuarioPost = async (req, res = response) => {
+    try {
+        const { nombre, email, password, telefono } = req.body;
+        const usuario = new Usuario({ nombre, email, password, telefono });
+        // Guardar en BD
+        await usuario.save();
 
-    const { nombre, correo, password, rol } = req.body;
-    const usuario = new Usuario({ nombre, correo, password, rol });
+        //  Envio de email con token para que se confirme el usuario
+        emailRegistro({ email, nombre, token: usuario.token });
 
-    // Encriptar la contraseña
-    const salt = bcrypt.genSaltSync();
-    usuario.password = bcrypt.hashSync(password, salt);
+        res.json({ usuario });
 
-    // Guardar en BD
-    await usuario.save();
-
-    res.json({
-        msg: 'post API - controlador',
-        usuario
-    })
-
-}
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo registrar el usuario'
+        })
+    }
+};
 
 const usuarioPut = async (req, res = response) => {
 
@@ -81,7 +86,7 @@ const usuarioDelete = async (req, res = response) => {
 
 }
 
-module.exports = {
+export {
     usuarioGet,
     usuarioPost,
     usuarioPut,

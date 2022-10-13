@@ -1,14 +1,16 @@
-const { Router } = require('express');
-const { check } = require('express-validator');
+import { Router } from "express";
+import { check } from "express-validator";
 
-const { validarCampos } = require('../middlewares/validar-campos');
-
-const { login, googleSingIn } = require('../controllers/auth');
+import validarCampos from "../middlewares/validar-campos.js";
+import { login, googleSingIn, confirmarUsuario } from "../controllers/auth.js";
 
 const router = Router();
 
+// Area de acceso publico
+router.get('/confirmar/:token', confirmarUsuario);
+
 router.post('/login', [
-    check('correo', 'El correo es obligatorio').isEmail(),
+    check('email', 'El Email es obligatorio').isEmail(),
     check('password', 'La contraseña es obligatorio').not().isEmpty(),
     validarCampos
 ], login);
@@ -18,4 +20,4 @@ router.post('/google', [
     validarCampos
 ], googleSingIn);
 
-module.exports = router;
+export default router;

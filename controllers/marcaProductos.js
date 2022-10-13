@@ -1,33 +1,43 @@
-const { response, request } = require('express');
+import MarcaProducto from '../models/marcaProducto.js';
 
-const MarcaProducto = require('../models/marcaProducto');
+const obtenerMarcaProductos = async (req, res) => {
+    try {
+        const { limite = 50, desde = 0 } = req.query;
+        const query = { estado: true }
 
-const obtenerMarcaProductos = async (req = request, res = response) => {
+        const [total, marcaProductos] = await Promise.all([
+            MarcaProducto.countDocuments(query),
+            MarcaProducto.find(query)
+                .skip(Number(desde))
+                .limit(Number(limite))
+                .sort({ nombre: 1 })
+        ])
 
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { estado: true }
-
-    const [total, marcaProductos] = await Promise.all([
-        MarcaProducto.countDocuments(query),
-        MarcaProducto.find(query)
-            .skip(Number(desde))
-            .limit(Number(limite))
-            .sort({ nombre: 1 })
-    ])
-
-    res.json({
-        total,
-        marcaProductos
-    })
-
+        res.json({
+            total,
+            marcaProductos
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener marcas del producto'
+        })
+    }
 }
 
 const obtenerMarcaProducto = async (req = request, res = response) => {
 
-    const { id } = req.params;
-    const marcaProducto = await MarcaProducto.findById({ _id: id });
+    try {
+        const { id } = req.params;
+        const marcaProducto = await MarcaProducto.findById({ _id: id });
 
-    res.json({ marcaProducto })
+        res.json({ marcaProducto })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener marca del producto'
+        })
+    }
 
 }
 
@@ -58,51 +68,58 @@ const crearMarcaProducto = async (req, res = response) => {
     } catch (error) {
         console.log(error);
         res.status(400).json({
-            msg: 'No se pudo actualizar marca del producto'
+            msg: 'No se pudo crear marca del producto'
         })
     }
 }
 
 const actualizarMarcaProducto = async (req, res = response) => {
 
-    const { id } = req.params;
-    const { estado, ...data } = req.body;
+    try {
+        const { id } = req.params;
+        const { estado, ...data } = req.body;
 
-    if (data.nombre) {
-
-        //  Verifico si no existe la marca
-        const marcaProductoDB = await MarcaProducto.findOne({ nombre: data.nombre.toUpperCase() });
-        if (marcaProductoDB) {
-            return res.status(400).json({
-                msg: `La marca ${marcaProductoDB.nombre}, ya existe`
-            })
+        if (data.nombre) {
+            //  Verifico si no existe la marca
+            const marcaProductoDB = await MarcaProducto.findOne({ nombre: data.nombre.toUpperCase() });
+            if (marcaProductoDB) {
+                return res.status(400).json({
+                    msg: `La marca ${marcaProductoDB.nombre}, ya existe`
+                })
+            }
         }
 
-        data.nombre = data.nombre.toUpperCase();
-    }
-    
-    if (data.nombreCorto) {
-        data.nombreCorto = data.nombreCorto.toUpperCase();
-    }
+        const marcaProducto = await MarcaProducto.findByIdAndUpdate(id, data, { new: true });
 
-    const marcaProducto = await MarcaProducto.findByIdAndUpdate(id, data ,{new:true});
+        res.json({ marcaProducto });
 
-    res.json({marcaProducto});
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo actualizar marca del producto'
+        })
+    }
 
 }
 
 const borrarMarcaProducto = async (req, res = response) => {
 
-    const { id } = req.params;
-    const marcaProducto = await MarcaProducto.findByIdAndUpdate(id, { estado: false });
+    try {
+        const { id } = req.params;
+        const marcaProducto = await MarcaProducto.findByIdAndUpdate(id, { estado: false });
 
-    res.json({
-        marcaProducto,
-    })
-
+        res.json({
+            marcaProducto,
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo borrar marca del producto'
+        })
+    }
 }
 
-module.exports = {
+export {
     obtenerMarcaProductos,
     obtenerMarcaProducto,
     crearMarcaProducto,

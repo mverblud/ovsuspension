@@ -1,72 +1,90 @@
-const { Schema, model } = require('mongoose');
+import mongoose from 'mongoose';
 
-const ProductoSchema = Schema({
+const ProductoSchema = mongoose.Schema({
     codigo: {
         type: String,
         required: [true, 'El codigo es obligatorio'],
+        trim: true,
+        uppercase: true
     },
     nombre: {
         type: String,
-        required: [true, 'El codigo es obligatorio']
+        required: [true, 'El nombre es obligatorio'],
+        trim: true,
+        uppercase: true
     },
     marcaProducto: {
-        type: Schema.Types.ObjectId,
-        ref:'MarcaProducto'    
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MarcaProducto'
     },
     marcaAuto: {
-        type: Schema.Types.ObjectId,
-        ref:'MarcaAuto'    
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MarcaAuto'
     },
     categoria: {
-        type: Schema.Types.ObjectId,
-        ref:'Categoria'    
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Categoria'
+    },
+    marcaAutoModelo: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MarcaAutoModelo'
     },
     stock: {
         type: Number,
-        default:0    
-    },
-    fechaAlta: {
-        type: Date,
-        default: Date.now    
+        default: 0
     },
     precio: {
         type: Number,
-        default: 0    
+        default: 0
     },
     iva: {
         type: Number,
-        default: 0    
+        default: 0
     },
     precioIva: {
         type: Number,
-        default: 0    
+        default: 0
     },
     descuento: {
         type: Number,
-        default: 0    
+        default: 0
     },
     precioFinal: {
         type: Number,
-        default: 0    
+        default: 0
     },
     habilitado: {
         type: Boolean,
-        default: true    
+        default: true
     },
     estado: {
         type: Boolean,
         required: [true],
         default: true,
     },
-    img: [{
+    img: {
         type: String,
         default: ''
-    }]
-});
+    }
+},
+    {
+        timestamps: true
+    }
+);
 
 ProductoSchema.methods.toJSON = function () {
     const { __v, ...producto } = this.toObject();
     return producto;
 }
 
-module.exports = model('Producto', ProductoSchema)
+// Realizo calculo de precios antes de guardar
+ProductoSchema.pre('save', async function () {
+    if ( this.precio > 0 &&  this.iva > 0) {
+        this.precioIva = ((this.precio * this.iva) / 100) + this.precio
+    } else {
+        this.precioIva = this.precio
+    }
+});
+
+const Producto = mongoose.model('Producto', ProductoSchema);
+export default Producto; 

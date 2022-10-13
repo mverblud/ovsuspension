@@ -1,10 +1,10 @@
-const MarcaAuto  = require('../models/marcaAuto');
-const MarcaAutoModelo = require('../models/marcaAutoModelo');
-const MarcaProducto = require('../models/marcaProducto');
-const Categoria = require('../models/categoria');
-const Producto = require('../models/producto');
-const Role = require('../models/role');
-const Usuario = require('../models/usuario');
+import MarcaAuto       from '../models/marcaAuto.js';
+import MarcaAutoModelo from '../models/marcaAutoModelo.js';
+import MarcaProducto   from '../models/marcaProducto.js';
+import Categoria       from '../models/categoria.js';
+import Producto        from '../models/producto.js';
+import Role            from '../models/role.js';
+import Usuario         from '../models/usuario.js';
 
 const esRolValido = async (rol = '') => {
     const existeRol = await Role.findOne({ rol });
@@ -13,13 +13,12 @@ const esRolValido = async (rol = '') => {
     }
 }
 
-const emailExiste = async (correo = '') => {
+const emailExiste = async (email = '') => {
 
-    const existeEmail = await Usuario.findOne({ correo })
+    const existeEmail = await Usuario.findOne({ email });
     if (existeEmail) {
-        throw new Error(`El corre: ${correo} ya está registrado en la BD`);
-    }
-
+        throw new Error(`El email: ${email} ya está registrado en la BD`);
+    };
 }
 
 const existeMarcaAuto = async (id = '') => {
@@ -29,7 +28,6 @@ const existeMarcaAuto = async (id = '') => {
     if (!existeMarca) {
         throw new Error(`El id no existe ${id}`);
     }
-
 }
 
 const existeUsuarioPorId = async (id = '') => {
@@ -81,7 +79,7 @@ const existeProducto = async (id = '') => {
 
 }
 
-module.exports = {
+export {
     esRolValido,
     emailExiste,
     existeUsuarioPorId,

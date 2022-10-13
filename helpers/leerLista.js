@@ -1,20 +1,19 @@
-const csv = require('csv-parser');
-const fs = require('fs');
+import csv from 'csv-parser';
+import fs from 'fs';
 
 const leerLista = (nombreArch) => {
-
     return new Promise((resolve, reject) => {
 
-        const productos  = [];
+        const productos      = [];
         const marcaProductos = [];
-        const marcaAutos = [];
-        const categorias = [];
+        const marcaAutos     = [];
+        const categorias     = [];
 
         fs.createReadStream(nombreArch)
             .pipe(csv({
                 separator: ';',
                 newline: '\n',
-                headers: ['codigo','marcaProducto','marcaAuto', 'categoria', 'nombre'],
+                headers: ['codigo', 'marcaProducto', 'marcaAuto', 'categoria', 'nombre'],
             }))
             .on('error', (err) => {
                 return reject(`Error, ${err}`);
@@ -34,11 +33,11 @@ const leerLista = (nombreArch) => {
                 }
 
                 const producto = {
-                    codigo:         data.codigo.toUpperCase().trim(),
-                    marcaProducto : data.marcaProducto.toUpperCase().trim(),
-                    marcaAuto:      data.marcaAuto.toUpperCase().trim(),
-                    categoria:      data.categoria.toUpperCase().trim(),
-                    nombre:         data.nombre.toUpperCase().trim(),
+                    codigo: data.codigo.toUpperCase().trim(),
+                    marcaProducto: data.marcaProducto.toUpperCase().trim(),
+                    marcaAuto: data.marcaAuto.toUpperCase().trim(),
+                    categoria: data.categoria.toUpperCase().trim(),
+                    nombre: data.nombre.toUpperCase().trim(),
                 }
 
                 productos.push(producto);
@@ -57,7 +56,7 @@ const leerLista = (nombreArch) => {
     })
 };
 
-module.exports = {
+export {
     leerLista
 }
 

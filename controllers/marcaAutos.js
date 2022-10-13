@@ -1,38 +1,45 @@
-const { response, request } = require('express');
+import MarcaAuto from '../models/marcaAuto.js';
 
-const MarcaAuto = require('../models/marcaAuto');
+const obtenerMarcaAutos = async (req, res) => {
+    try {
+        const { limite = 50, desde = 0 } = req.query;
+        const query = { estado: true }
 
-const obtenerMarcaAutos = async (req = request, res = response) => {
+        const [total, marcaAutos] = await Promise.all([
+            MarcaAuto.countDocuments(query),
+            MarcaAuto.find(query)
+                .skip(Number(desde))
+                .limit(Number(limite))
+                .sort({ nombre: 1 })
+        ]);
 
-    const { limite = 5, desde = 0 } = req.query;
-    const query = { estado: true }
+        res.json({
+            total,
+            marcaAutos
+        });
 
-    const [total, marcaAutos] = await Promise.all([
-        MarcaAuto.countDocuments(query),
-        MarcaAuto.find(query)
-            .populate('marcaAutoModelo','nombre')
-            .skip(Number(desde))
-            .limit(Number(limite))
-            .sort({ nombre: 1 })
-    ]);
-
-    res.json({
-        total,
-        marcaAutos
-    })
-
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener marcas de autos'
+        });
+    }
 }
 
 const obtenerMarcaAuto = async (req = request, res = response) => {
-
-    const { id } = req.params;
-    const marcaAuto = await MarcaAuto.findById({ _id: id }).populate('marcaAutoModelo');
-    res.json({ marcaAuto });
-
+    try {
+        const { id } = req.params;
+        const marcaAuto = await MarcaAuto.findById({ _id: id });
+        res.json({ marcaAuto });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener marca de auto'
+        });
+    }
 }
 
 const crearMarcaAuto = async (req, res = response) => {
-
     try {
         const nombre = req.body.nombre.toUpperCase();
 
@@ -48,44 +55,49 @@ const crearMarcaAuto = async (req, res = response) => {
 
         // Guardar en BD
         await marcaAuto.save();
-
         res.status(201).json(marcaAuto)
 
     } catch (error) {
         console.log(error);
         res.status(400).json({
-            msg: 'No se pudo actualizar marca auto'
+            msg: 'No se pudo crear marca auto'
         })
     }
 }
 
 const actualizarMarcaAuto = async (req, res = response) => {
+    try {
+        const { id } = req.params;
+        const { nombre } = req.body;
 
-    const { id } = req.params;
-    const { estado, ...data } = req.body;
+        const marcaAuto = await MarcaAuto.findByIdAndUpdate(id, { nombre }, { new: true });
 
-    if (data.nombre) {
-        data.nombre = data.nombre.toUpperCase();
+        res.json({ marcaAuto });
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo actualizar marca de auto'
+        });
     }
-
-    const marcaAuto = await MarcaAuto.findByIdAndUpdate(id, data, { new: true });
-
-    res.json({ marcaAuto });
-
 }
 
 const borrarMarcaAuto = async (req, res = response) => {
+    try {
+        const { id } = req.params;
+        const marcaAuto = await MarcaAuto.findByIdAndUpdate(id, { estado: false });
 
-    const { id } = req.params;
-    const marcaAuto = await MarcaAuto.findByIdAndUpdate(id, { estado: false });
-
-    res.json({
-        marcaAuto,
-    })
-
+        res.json({
+            marcaAuto,
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            msg: 'No se pudo obtener borrar de autos'
+        });
+    }
 }
 
-module.exports = {
+export {
     obtenerMarcaAutos,
     obtenerMarcaAuto,
     crearMarcaAuto,

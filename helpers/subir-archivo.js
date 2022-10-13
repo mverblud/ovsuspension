@@ -1,4 +1,8 @@
-const path = require('path');
+import path from 'path';
+import {fileURLToPath} from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const subirArchivo = (files, extensionValidas = ['txt', 'csv'], carpeta = '') => {
 
@@ -25,6 +29,6 @@ const subirArchivo = (files, extensionValidas = ['txt', 'csv'], carpeta = '') =>
     })
 }
 
-module.exports = {
+export {
     subirArchivo
 }

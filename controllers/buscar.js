@@ -1,10 +1,9 @@
-const { response } = require("express");
-const { ObjectId } = require('mongoose').Types;
+import mongoose from 'mongoose';
 
-const Producto = require('../models/producto');
-const Categoria = require('../models/categoria');
-const MarcaAuto = require('../models/marcaAuto');
-const MarcaProducto = require('../models/marcaProducto');
+import Producto from '../models/producto.js';
+import Categoria from '../models/categoria.js';
+import MarcaAuto from '../models/marcaAuto.js';
+import MarcaProducto from '../models/marcaProducto.js';
 
 const coleccionesPermitidas = [
     'categorias',
@@ -15,7 +14,7 @@ const coleccionesPermitidas = [
 
 const buscarMarcaAutos = async (termino = '', res = response) => {
 
-    const esMongoID = ObjectId.isValid(termino);
+    const esMongoID = mongoose.Types.ObjectId.isValid(termino);
 
     if (esMongoID) {
         const marcaAuto = await MarcaAuto.findById(termino);
@@ -38,7 +37,7 @@ const buscarMarcaAutos = async (termino = '', res = response) => {
 
 const buscarMarcaProductos = async (termino = '', res = response) => {
 
-    const esMongoID = ObjectId.isValid(termino);
+    const esMongoID = mongoose.Types.ObjectId.isValid(termino);
 
     if (esMongoID) {
         const marcaProducto = await MarcaProducto.findById(termino);
@@ -59,15 +58,36 @@ const buscarMarcaProductos = async (termino = '', res = response) => {
     })
 }
 
+const buscarCategorias = async (termino = '', res = response) => {
+
+    const esMongoID = mongoose.Types.ObjectId.isValid(termino);
+
+    if (esMongoID) {
+        const categoria = await Categoria.findById(termino);
+        return res.json({
+            results: (categoria) ? [categoria] : []
+        })
+    }
+
+    const regex = new RegExp(termino, 'i')
+
+    const categorias = await Categoria.find({ nombre: regex, estado: true });
+
+
+    res.json({
+        results: categorias
+    })
+}
+
 const buscarProductos = async (termino = undefined, req, res = response) => {
 
     // paginado y filtro
     let filter = {};
-    const { limite = 10, desde = 0, categoria, marcaAuto, marcaProducto } = req.query;
+    const { limite = 50, desde = 0, categoria, marcaAuto, marcaProducto } = req.query;
 
     if (termino !== undefined) {
 
-    //  Expresion regular
+        //  Expresion regular
         const regex = new RegExp(termino, 'i');
         filter = { $and: [{ $or: [{ nombre: regex }, { codigo: regex }] }, { $and: [{ estado: true }] }] };
         switch (true) {
@@ -149,27 +169,6 @@ const buscarProductos = async (termino = undefined, req, res = response) => {
 
 }
 
-const buscarCategorias = async (termino = '', res = response) => {
-
-    const esMongoID = ObjectId.isValid(termino);
-
-    if (esMongoID) {
-        const categoria = await Categoria.findById(termino);
-        return res.json({
-            results: (categoria) ? [categoria] : []
-        })
-    }
-
-    const regex = new RegExp(termino, 'i')
-
-    const categorias = await Categoria.find({ nombre: regex, estado: true });
-
-
-    res.json({
-        results: categorias
-    })
-}
-
 const buscar = (req, res = response) => {
 
     const { coleccion } = req.params;
@@ -202,6 +201,6 @@ const buscar = (req, res = response) => {
     }
 }
 
-module.exports = {
+export {
     buscar
 }

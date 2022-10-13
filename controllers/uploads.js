@@ -1,44 +1,34 @@
-const { response } = require("express");
-const { subirArchivo } = require("../helpers/subir-archivo");
-const { leerLista } = require('../helpers/leerLista');
-const { impactarLista, impactarProductos } = require("../helpers/impactarLista");
+import { subirArchivo } from "../helpers/subir-archivo.js";
+import { leerLista } from '../helpers/leerLista.js';
+import { impactarLista, impactarProductos } from "../helpers/impactarLista.js";
 
-
-const cargarArchivo = async (req, res = response) => {
+const cargarArchivo = async (req, res) => {
 
     try {
-
-    //  Subo Archivo csv
+        //  Subo Archivo csv
         const uploadPath = await subirArchivo(req.files, undefined, 'lista');
-    //  obtengo resultado de la lectura
+        //  obtengo resultado de la lectura
         const { productos, marcaProductos, marcaAutos, categorias } = await leerLista(uploadPath);
-    //  impacto marcaProductos, marcaAutos, Categorias
-        const { marcasIds, categoriasIds, marcaProductosIds } = await impactarLista(marcaProductos, marcaAutos, categorias);
+        //  impacto marcaProductos, marcaAutos, Categorias y completo productos con sus ids
+        const productosCompletos = await impactarLista(marcaProductos, marcaAutos, categorias, productos);
+        // impacto producto con toda la info ya completa
+        await impactarProductos(productosCompletos);
 
-        const { ok } = await impactarProductos(productos, marcasIds, categoriasIds, marcaProductosIds);
-
-        if (ok) {
-            res.json({
-                uploadPath,
-                productos: productos.length,
-                marcaAutos: marcaAutos.length,
-                categorias: categorias.length,
-                marcaProductos : marcaProductos.length
-            });
-        } else {
-            res.status(400).json({
-                msg: 'No se pudo procesar el archivo.'
-            });
-        }
-
-    } catch (msg) {
-        res.status(400).json({
-            msg
+        res.json({
+            uploadPath,
+            productos: productos.length,
+            marcaAutos: marcaAutos.length,
+            categorias: categorias.length,
+            marcaProductos: marcaProductos.length
         });
+
+    } catch (error) {
+        console.log('Error al cargarArchivo', error);
+        res.status(400).json({ msg: 'Error al cargarArchivo' });
     }
 
 }
 
-module.exports = {
+export {
     cargarArchivo,
 }
