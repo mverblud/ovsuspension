@@ -13,6 +13,11 @@ const MarcaAutoSchema = mongoose.Schema(
             type: Boolean,
             required: [true],
             default: true,
+        },
+        habilitado: {
+            type: Boolean,
+            required: [true],
+            default: true,
         }
     },
     {
