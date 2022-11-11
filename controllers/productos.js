@@ -20,6 +20,7 @@ const obtenerProductos = async (req = request, res = response) => {
                 .populate('marcaAuto', 'nombre')
                 .populate('marcaProducto', 'nombre')
                 .populate('marcaAutoModelo', 'nombre')
+                .populate('proveedor', 'nombre')
                 .skip(Number(desde))
                 .limit(Number(limite))
         ])
@@ -45,6 +46,7 @@ const obtenerProducto = async (req = request, res = response) => {
             .populate('marcaAuto', 'nombre')
             .populate('marcaProducto', 'nombre')
             .populate('marcaAutoModelo', 'nombre')
+            .populate('proveedor', 'nombre')
 
         res.json({ producto });
     } catch (error) {

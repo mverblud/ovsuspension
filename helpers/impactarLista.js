@@ -2,16 +2,18 @@ import MarcaAuto from "../models/marcaAuto.js";
 import MarcaProducto from "../models/marcaProducto.js";
 import Categoria from "../models/categoria.js";
 import Producto from "../models/producto.js";
+import Proveedor from "../models/proveedor.js";
 
-const impactarLista = async (marcaProductos = [], marcaAutos = [], categorias = [], productos = []) => {
+const impactarLista = async (marcaProductos = [], marcaAutos = [], categorias = [], productos = [], proveedores = []) => {
 
-    const [marcasIds, categoriasIds, marcaProductosIds] = await Promise.all([
+    const [marcasIds, categoriasIds, marcaProductosIds, proveedoresIds] = await Promise.all([
         obtengoMarcaAuto(marcaAutos),
         obtengoCategoria(categorias),
-        obtengoMarcaProductos(marcaProductos)
+        obtengoMarcaProductos(marcaProductos),
+        obtengoProveedor(proveedores)
     ]);
 
-    await completoProductos(productos, categoriasIds, marcasIds, marcaProductosIds);
+    await completoProductos(productos, categoriasIds, marcasIds, marcaProductosIds, proveedoresIds);
     return productos;
 }
 
@@ -70,6 +72,38 @@ const obtengoCategoria = async (categorias) => {
     return categoriasIds;
 }
 
+const obtengoProveedor = async (proveedores) => {
+    const proveedoresIds = await Promise.all(
+
+        proveedores.map(async (proveedor) => {
+            try {
+                let id = '';
+                let nombre = '';
+                const nombreCorto = proveedor;
+
+                //  Verifico si no existe la marca la guardo en BD
+                const proveedorDB = await Proveedor.findOne({ nombreCorto });
+                if (!proveedorDB) {
+                    const proveedor = new Proveedor({ nombreCorto });
+                    await proveedor.save();
+                    id = proveedor._id;
+                } else {
+                    id = proveedorDB._id;
+                    nombre = proveedorDB.nombre;
+                }
+
+                return {
+                    nombre,
+                    id,
+                    nombreCorto
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        }));
+    return proveedoresIds;
+}
+
 const obtengoMarcaProductos = async (marcaProductos) => {
     const marcaProductosIds = await Promise.all(
 
@@ -99,11 +133,7 @@ const obtengoMarcaProductos = async (marcaProductos) => {
     return marcaProductosIds;
 }
 
-const completoProductos = async (productos, categoriasIds, marcasIds, marcaProductosIds) => {
-
-    /*     categoriasIds.map(categoria => {
-            console.log(categoria.nombre);
-        }) */
+const completoProductos = async (productos, categoriasIds, marcasIds, marcaProductosIds, proveedoresIds) => {
 
     categoriasIds.forEach(categoria => {
         productos.forEach(producto => {
@@ -129,7 +159,16 @@ const completoProductos = async (productos, categoriasIds, marcasIds, marcaProdu
         })
     });
 
-    //return productos;
+    proveedoresIds.forEach(proveedor => {
+        productos.forEach(producto => {
+            if (producto.proveedor === proveedor.nombreCorto) {
+                producto.proveedorId = proveedor.id;
+            }
+        })
+    });
+
+    console.log(productos);
+
 }
 
 const impactarProductos = async (productos = []) => {
@@ -137,7 +176,7 @@ const impactarProductos = async (productos = []) => {
     await Promise.all(productos.map(async (producto) => {
 
         try {
-            let { codigo, marcaProductoId, marcaAutoId, categoriaId, nombre } = producto;
+            let { codigo, marcaProductoId, marcaAutoId, categoriaId, nombre, proveedorId } = producto;
             const productoDB = await Producto.findOne({ codigo });
             if (!productoDB) {
                 const producto = new Producto({
@@ -145,12 +184,13 @@ const impactarProductos = async (productos = []) => {
                     nombre,
                     marcaAuto: marcaAutoId,
                     marcaProducto: marcaProductoId,
-                    categoria: categoriaId
+                    categoria: categoriaId,
+                    proveedor: proveedorId
                 });
 
                 // Guardar en BD
                 await producto.save();
-            } 
+            }
         } catch (error) {
             console.log('impactarProductos', error);
         }

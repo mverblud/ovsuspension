@@ -29,6 +29,10 @@ const ProductoSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MarcaAutoModelo'
     },
+    proveedor: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Proveedor'
+    },
     stock: {
         type: Number,
         default: 0

@@ -4,6 +4,7 @@ import marcaAuto from './marcaAuto.js';
 import marcaProducto from './marcaProducto.js';
 import roles from './roles.js';
 import usuarios from './usuarios.js';
+import proveedores from './proveedores.js';
 
 import Categoria from '../models/categoria.js';
 import MarcaAuto from '../models/marcaAuto.js';
@@ -12,6 +13,7 @@ import MarcaProducto from '../models/marcaProducto.js';
 import Producto from '../models/producto.js';
 import Role from '../models/role.js';
 import Usuario from '../models/usuario.js';
+import Proveedores from '../models/proveedor.js';
 
 import dotenv from  "dotenv";
 dotenv.config();
@@ -29,7 +31,7 @@ const importarDatos = async () => {
             MarcaProducto.insertMany(marcaProducto),
             Role.insertMany(roles),
             Usuario.insertMany(usuarios),
-            
+            Proveedores.insertMany(proveedores)
         ])
 
         console.log('Datos importados Correctamente');
@@ -54,7 +56,8 @@ const eliminarDatos = async () => {
             MarcaProducto.deleteMany(),
             Producto.deleteMany(),
             Role.deleteMany(),
-            Usuario.deleteMany()
+            Usuario.deleteMany(),
+            Proveedores.deleteMany()
         ])
 
         console.log('Datos Elimnados Correctamente');

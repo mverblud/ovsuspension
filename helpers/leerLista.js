@@ -8,12 +8,13 @@ const leerLista = (nombreArch) => {
         const marcaProductos = [];
         const marcaAutos     = [];
         const categorias     = [];
+        const proveedores    = [];
 
         fs.createReadStream(nombreArch)
             .pipe(csv({
                 separator: ';',
                 newline: '\n',
-                headers: ['codigo', 'marcaProducto', 'marcaAuto', 'categoria', 'nombre'],
+                headers: ['codigo', 'marcaProducto', 'marcaAuto', 'categoria', 'nombre','proveedor'],
             }))
             .on('error', (err) => {
                 return reject(`Error, ${err}`);
@@ -32,12 +33,17 @@ const leerLista = (nombreArch) => {
                     categorias.push(data.categoria.toUpperCase().trim())
                 }
 
+                if (!proveedores.includes(data.proveedor.toUpperCase().trim())) {
+                    proveedores.push(data.proveedor.toUpperCase().trim())
+                }
+
                 const producto = {
                     codigo: data.codigo.toUpperCase().trim(),
                     marcaProducto: data.marcaProducto.toUpperCase().trim(),
                     marcaAuto: data.marcaAuto.toUpperCase().trim(),
                     categoria: data.categoria.toUpperCase().trim(),
                     nombre: data.nombre.toUpperCase().trim(),
+                    proveedor : data.proveedor.toUpperCase().trim()
                 }
 
                 productos.push(producto);
@@ -48,7 +54,8 @@ const leerLista = (nombreArch) => {
                     productos,
                     marcaProductos,
                     marcaAutos,
-                    categorias
+                    categorias,
+                    proveedores
                 });
 
             });
