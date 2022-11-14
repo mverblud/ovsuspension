@@ -4,18 +4,18 @@ import Producto from '../models/producto.js';
 import Categoria from '../models/categoria.js';
 import MarcaAuto from '../models/marcaAuto.js';
 import MarcaProducto from '../models/marcaProducto.js';
+import Proveedor from '../models/proveedor.js';
 
 const coleccionesPermitidas = [
     'categorias',
     'productos',
     'marcaAutos',
-    'marcaProductos'
+    'marcaProductos',
+    'proveedores'
 ];
 
 const buscarMarcaAutos = async (termino = '', res = response) => {
-
     const esMongoID = mongoose.Types.ObjectId.isValid(termino);
-
     if (esMongoID) {
         const marcaAuto = await MarcaAuto.findById(termino);
         return res.json({
@@ -24,7 +24,6 @@ const buscarMarcaAutos = async (termino = '', res = response) => {
     }
 
     const regex = new RegExp(termino, 'i')
-
     const marcaAutos = await MarcaAuto.find({
         $or: [{ nombre: regex }],
         $and: [{ estado: true }]
@@ -38,7 +37,6 @@ const buscarMarcaAutos = async (termino = '', res = response) => {
 const buscarMarcaProductos = async (termino = '', res = response) => {
 
     const esMongoID = mongoose.Types.ObjectId.isValid(termino);
-
     if (esMongoID) {
         const marcaProducto = await MarcaProducto.findById(termino);
         return res.json({
@@ -47,7 +45,6 @@ const buscarMarcaProductos = async (termino = '', res = response) => {
     }
 
     const regex = new RegExp(termino, 'i')
-
     const marcaProductos = await MarcaProducto.find({
         $or: [{ nombre: regex }],
         $and: [{ estado: true }]
@@ -61,7 +58,6 @@ const buscarMarcaProductos = async (termino = '', res = response) => {
 const buscarCategorias = async (termino = '', res = response) => {
 
     const esMongoID = mongoose.Types.ObjectId.isValid(termino);
-
     if (esMongoID) {
         const categoria = await Categoria.findById(termino);
         return res.json({
@@ -70,9 +66,7 @@ const buscarCategorias = async (termino = '', res = response) => {
     }
 
     const regex = new RegExp(termino, 'i')
-
     const categorias = await Categoria.find({ nombre: regex, estado: true });
-
 
     res.json({
         results: categorias
@@ -83,7 +77,7 @@ const buscarProductos = async (termino = undefined, req, res = response) => {
 
     // paginado y filtro
     let filter = {};
-    const { limite = 50, desde = 0, categoria, marcaAuto, marcaProducto } = req.query;
+    const { limite = 50, desde = 0, categoria, marcaAuto, marcaProducto, proveedor } = req.query;
 
     if (termino !== undefined) {
 
@@ -170,6 +164,24 @@ const buscarProductos = async (termino = undefined, req, res = response) => {
 
 }
 
+const buscarProveedores = async (termino = '', res = response) => {
+
+    const esMongoID = mongoose.Types.ObjectId.isValid(termino);
+    if (esMongoID) {
+        const proveedor = await Proveedor.findById(termino);
+        return res.json({
+            results: (proveedor) ? [proveedor] : []
+        })
+    }
+
+    const regex = new RegExp(termino, 'i')
+    const proveedores = await Proveedor.find({ nombre: regex });
+
+    res.json({
+        results: proveedores
+    })
+}
+
 const buscar = (req, res = response) => {
 
     const { coleccion } = req.params;
@@ -193,6 +205,9 @@ const buscar = (req, res = response) => {
             break;
         case 'productos':
             buscarProductos(termino, req, res);
+            break;
+        case 'proveedores':
+            buscarProveedores(termino, res);
             break;
 
         default:
