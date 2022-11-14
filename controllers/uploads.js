@@ -1,6 +1,6 @@
 import { subirArchivo } from "../helpers/subir-archivo.js";
-import { leerLista } from '../helpers/leerLista.js';
-import { impactarLista, impactarProductos } from "../helpers/impactarLista.js";
+import { leerLista, leerListaPrecios } from '../helpers/leerLista.js';
+import { actualizarPrecioProducto, impactarLista, impactarProductos } from "../helpers/impactarLista.js";
 
 const cargarArchivo = async (req, res) => {
 
@@ -31,6 +31,26 @@ const cargarArchivo = async (req, res) => {
 
 }
 
+const actualizarPrecios = async (req, res) => {
+
+    try {
+        const { id } = req.params;
+        const uploadPath = await subirArchivo(req.files, undefined, 'lista');
+        const { productos } = await leerListaPrecios(uploadPath);
+        const { cantActualizada, cantTotal } = await actualizarPrecioProducto(productos, id)
+        res.json({
+            productosLeidos: productos.length,
+            cantTotal,
+            cantActualizada
+        });
+
+    } catch (error) {
+        console.log('Error al cargarArchivo', error);
+        res.status(400).json({ msg: 'Error al cargarArchivo' });
+    }
+}
+
 export {
     cargarArchivo,
+    actualizarPrecios
 }

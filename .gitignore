@@ -1,2 +1,4 @@
 node_modules/
 .env
+/uploads/lista/lista*
+/uploads/lista/module*

@@ -156,6 +156,7 @@ const buscarProductos = async (termino = undefined, req, res = response) => {
             .populate('categoria', 'nombre')
             .populate('marcaAuto', 'nombre')
             .populate('marcaProducto', 'nombre')
+            .populate('proveedor', 'nombre')
             .skip(Number(desde))
             .limit(Number(limite))
     ])

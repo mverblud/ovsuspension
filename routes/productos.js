@@ -5,7 +5,7 @@ import validarCampos from "../middlewares/validar-campos.js";
 import validarJWT from "../middlewares/validarJWT.js";
 
 import { crearProducto, obtenerProductos, obtenerProducto, actualizarProducto, borrarProducto } from '../controllers/productos.js';
-import { existeCategoria, existeProducto, existeMarcaProducto, existeMarcaAuto,existeMarcaAutoModelo } from '../helpers/db-validators.js';
+import { existeCategoria, existeProducto, existeMarcaProducto, existeMarcaAuto,existeMarcaAutoModelo, existeProveedor } from '../helpers/db-validators.js';
 import { esAdminRole } from '../middlewares/validar-roles.js';
 
 const router = Router();
@@ -44,6 +44,9 @@ router.post('/', [
     check('marcaAutoModelo', 'El Modelo es obligatorio').not().isEmpty(),
     check('marcaAutoModelo', 'No es un un ID válido').isMongoId(),
     check('marcaAutoModelo').custom(existeMarcaAutoModelo),
+    check('proveedor', 'El proveedor es obligatorio').not().isEmpty(),
+    check('proveedor', 'No es un un ID válido').isMongoId(),
+    check('proveedor').custom(existeProveedor),
     validarCampos
 ], crearProducto);
 

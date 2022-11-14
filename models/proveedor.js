@@ -4,12 +4,12 @@ const ProveedorSchema = mongoose.Schema({
     nombre: {
         type: String,
         required: [true, 'El rol es obligatorio'],
-        uppercase : true
+        uppercase: true
     },
     nombreCorto: {
         type: String,
         trim: true,
-        uppercase : true
+        uppercase: true
     },
     direccion: {
         type: String,
@@ -26,7 +26,11 @@ const ProveedorSchema = mongoose.Schema({
         trim: true,
         lowercase: true
     },
-});
+},
+    {
+        timestamps: true
+    }
+);
 
 const Provedor = mongoose.model('Proveedor', ProveedorSchema);
 export default Provedor;

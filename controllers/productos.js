@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
 
-import Producto        from '../models/producto.js';
-import Categoria       from '../models/categoria.js';
-import MarcaProducto   from '../models/marcaProducto.js';
-import MarcaAuto       from '../models/marcaAuto.js';
+import Producto from '../models/producto.js';
+import Categoria from '../models/categoria.js';
+import MarcaProducto from '../models/marcaProducto.js';
+import MarcaAuto from '../models/marcaAuto.js';
 import MarcaAutoModelo from '../models/marcaAutoModelo.js';
+import Provedor from '../models/proveedor.js';
 
 
 const obtenerProductos = async (req = request, res = response) => {
@@ -61,7 +62,7 @@ const crearProducto = async (req, res) => {
 
     try {
 
-        const { codigo, nombre, marcaProducto, marcaAuto,marcaAutoModelo ,categoria, stock, precio, iva, descuento, img } = req.body;
+        const { codigo, nombre, marcaProducto, marcaAuto, marcaAutoModelo, categoria, stock, precio, iva, descuento, img, proveedor } = req.body;
         const productoDB = await Producto.findOne({ codigo });
 
         if (productoDB) {
@@ -81,7 +82,8 @@ const crearProducto = async (req, res) => {
             precio,
             iva,
             descuento,
-            img
+            img,
+            proveedor
         });
 
         // Guardar en BD
@@ -101,7 +103,7 @@ const actualizarProducto = async (req, res = response) => {
 
     try {
         const { id } = req.params;
-        const { codigo, nombre, marcaProducto, marcaAuto,marcaAutoModelo, categoria, stock, precio, iva, descuento, img } = req.body;
+        const { codigo, nombre, marcaProducto, marcaAuto, marcaAutoModelo, categoria, stock, precio, iva, descuento, img,proveedor } = req.body;
 
         if (codigo) {
             const productoDB = await Producto.findOne({ codigo });
@@ -180,6 +182,23 @@ const actualizarProducto = async (req, res = response) => {
             }
         }
 
+        if (proveedor) {
+            const esMongoID = mongoose.Types.ObjectId.isValid(proveedor);
+            if (esMongoID) {
+                //  Verifico si no existe la marca
+                const existeProveedor = await Provedor.findById({ _id: marcaAutoModelo });
+                if (!existeProveedor) {
+                    return res.status(400).json({
+                        msg: `El Proveedor ${proveedor}, no existe existe`
+                    })
+                }
+            } else {
+                return res.status(400).json({
+                    msg: `No es un un ID válido`
+                })
+            }
+        }
+
         const data = {
             codigo,
             nombre,
@@ -190,7 +209,8 @@ const actualizarProducto = async (req, res = response) => {
             precio,
             iva,
             descuento,
-            img
+            img,
+            proveedor
         };
 
         const producto = await Producto.findByIdAndUpdate(id, data, { new: true });
@@ -210,7 +230,7 @@ const borrarProducto = async (req, res = response) => {
     try {
         const { id } = req.params;
         const producto = await Producto.findByIdAndUpdate(id, { estado: false });
-    
+
         res.json({
             producto,
         })
@@ -218,7 +238,7 @@ const borrarProducto = async (req, res = response) => {
         console.log(error);
         res.status(400).json({
             msg: 'No se pudo borrar el producto'
-        })        
+        })
     }
 }
 

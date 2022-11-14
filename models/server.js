@@ -11,6 +11,7 @@ import marcaProductosRoute    from '../routes/marcaProductos.js';
 import marcaAutosRoute        from '../routes/marcaAutos.js';
 import marcaAutosModelosRoute from '../routes/marcaAutoModelos.js';
 import productosRoute         from '../routes/productos.js';
+import proveedoresRoute       from '../routes/proveedores.js';
 import uploadsRouter          from '../routes/uploads.js';
 
 export default class Server {
@@ -21,11 +22,12 @@ export default class Server {
         this.path = {
             auth:              '/api/auth',
             buscar :           '/api/buscar',
-            productos:         '/api/productos',
             categorias:        '/api/categorias',
-            marcaProductos:    '/api/marcaProductos',
             marcaAutos:        '/api/marcaAutos',
             marcaAutosModelos: '/api/marcaAutoModelos',
+            marcaProductos:    '/api/marcaProductos',
+            productos:         '/api/productos',
+            proveedores:       '/api/proveedores',
             usuarios:          '/api/usuarios',
             uploads:           '/api/uploads'
         }
@@ -65,6 +67,7 @@ export default class Server {
         this.app.use(this.path.buscar, buscarRoute);
         this.app.use(this.path.categorias, categoriasRoute);
         this.app.use(this.path.productos, productosRoute);
+        this.app.use(this.path.proveedores, proveedoresRoute)
         this.app.use(this.path.marcaProductos, marcaProductosRoute);
         this.app.use(this.path.marcaAutos, marcaAutosRoute);
         this.app.use(this.path.marcaAutosModelos, marcaAutosModelosRoute);

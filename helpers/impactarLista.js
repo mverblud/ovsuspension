@@ -198,7 +198,34 @@ const impactarProductos = async (productos = []) => {
     }));
 }
 
+const actualizarPrecioProducto = async (productos, id) => {
+    let cantActualizada = 0;
+
+    const cantTotal = await Producto.count({ proveedor: id })
+    if (cantTotal !== 0) {
+        await Promise.all(productos.map(async (producto) => {
+            try {
+                let { codigo, precio, iva } = producto;
+                let precioIva = ((precio * iva) / 100) + precio;
+                precioIva = precioIva.toFixed(2);
+                const productoActualizado = await Producto.findOneAndUpdate({ codigo, proveedor: id }, { precio, iva, precioIva }, { new: true });
+                if (productoActualizado) {
+                    cantActualizada++;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }));
+    }
+
+    return {
+        cantActualizada,
+        cantTotal
+    };
+}
+
 export {
     impactarLista,
-    impactarProductos
+    impactarProductos,
+    actualizarPrecioProducto
 }
