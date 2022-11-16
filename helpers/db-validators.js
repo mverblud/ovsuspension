@@ -70,6 +70,17 @@ const existeProveedor = async (id = '') => {
     }
 }
 
+const camposObligatorios = async (array) => {
+
+    if (!array.includes('codigo') ) {
+        throw new Error(`Es obligatorio que se incluya en el headers con los campos : Codigo`);
+    } 
+
+    if (!array.includes('precio') ) {
+        throw new Error(`Es obligatorio que se incluya en el headers con los campos : Precio`);
+    } 
+}
+
 export {
     esRolValido,
     emailExiste,
@@ -79,5 +90,6 @@ export {
     existeMarcaProducto,
     existeCategoria,
     existeProducto,
-    existeProveedor
+    existeProveedor,
+    camposObligatorios
 }

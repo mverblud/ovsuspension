@@ -63,7 +63,7 @@ const leerLista = (nombreArch) => {
     })
 };
 
-const leerListaPrecios = (nombreArch) => {
+const leerListaPrecios = (nombreArch, header = []) => {
 
     return new Promise((resolve, reject) => {
 
@@ -73,28 +73,40 @@ const leerListaPrecios = (nombreArch) => {
             .pipe(csv({
                 separator: ';',
                 newline: '\n',
-                headers: ['', 'codigo', 'precio', 'img',],
+                headers: header,//['', 'codigo', 'precio', 'img',],
             }))
             .on('error', (err) => {
+                console.log(err);
                 return reject(`Error, ${err}`);
             })
             .on('data', (data) => {
+                
+                let precioIva = 0;
+                let precio = 0;
+                let iva = 21;
+
+                if (!isNaN(data.precio)) {
+                    precio = parseFloat(data.precio).toFixed(2);
+                    precioIva = parseFloat((precio * 1.21)).toFixed(2);
+                } else {
+                    iva = 0;
+                }
 
                 const producto = {
                     codigo: data.codigo.toUpperCase().trim(),
-                    precio: parseFloat(data.precio),
-                    imagen: data.img.toUpperCase().trim(),
-                    iva: 21,
+                    precio: parseFloat(precio),
+                    precioIva: parseFloat(precioIva),
+                    iva
                 }
 
                 productos.push(producto);
             })
             .on('end', () => {
-
+                productos = productos.filter(producto => producto.precio !== 0);
+                productos = productos.filter(producto => producto.codigo !== '');
                 resolve({
                     productos,
                 });
-
             });
 
     })

@@ -7,7 +7,7 @@ import validarJWT from "../middlewares/validarJWT.js";
 import { actualizarPrecios, cargarArchivo } from '../controllers/uploads.js';
 import { validarArchivoSubir } from '../middlewares/validar-archivo.js';
 import { esAdminRole } from '../middlewares/validar-roles.js';
-import { existeProveedor } from "../helpers/db-validators.js";
+import { camposObligatorios, existeProveedor } from "../helpers/db-validators.js";
 
 const router = Router();
 
@@ -24,6 +24,7 @@ router.post('/actualizar-precios/:id', [
     check('id', 'El proveedor es obligatorio').not().isEmpty(),
     check('id', 'No es un un ID válido').isMongoId(),
     check('id').custom(existeProveedor),
+    check('header').custom(camposObligatorios),
     validarCampos
 ], actualizarPrecios);
 

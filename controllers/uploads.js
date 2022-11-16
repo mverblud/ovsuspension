@@ -35,13 +35,27 @@ const actualizarPrecios = async (req, res) => {
 
     try {
         const { id } = req.params;
+        const { header } = req.body;
+
         const uploadPath = await subirArchivo(req.files, undefined, 'lista');
-        const { productos } = await leerListaPrecios(uploadPath);
-        const { cantActualizada, cantTotal } = await actualizarPrecioProducto(productos, id)
+        const { productos } = await leerListaPrecios(uploadPath, header);
+        const { cantActualizada, cantTotal, nombre } = await actualizarPrecioProducto(productos, id);
+
         res.json({
-            productosLeidos: productos.length,
-            cantTotal,
-            cantActualizada
+            proveedor: {
+                nombre,
+                cantProductos: cantTotal,
+            },
+            infoArchivo: {
+                nombreArchivo: uploadPath,
+                header,
+                productosLeidos: productos.length,
+            },
+            resultado: {
+                cantLeida: cantActualizada,
+                cantActualizada,
+                cantNoEncontrada: (productos.length - cantActualizada),
+            },
         });
 
     } catch (error) {

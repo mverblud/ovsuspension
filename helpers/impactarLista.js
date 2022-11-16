@@ -199,28 +199,35 @@ const impactarProductos = async (productos = []) => {
 }
 
 const actualizarPrecioProducto = async (productos, id) => {
+
     let cantActualizada = 0;
 
-    const cantTotal = await Producto.count({ proveedor: id })
+    const [cantTotal, proveedor] = await Promise.all([
+        Producto.countDocuments({ proveedor: id }),
+        Proveedor.findById({ _id: id })
+    ])
+
+    const { nombre } = proveedor;
+
     if (cantTotal !== 0) {
-        await Promise.all(productos.map(async (producto) => {
+        await Promise.all(productos.map(async producto => {
             try {
-                let { codigo, precio, iva } = producto;
-                let precioIva = ((precio * iva) / 100) + precio;
-                precioIva = precioIva.toFixed(2);
-                const productoActualizado = await Producto.findOneAndUpdate({ codigo, proveedor: id }, { precio, iva, precioIva }, { new: true });
-                if (productoActualizado) {
+                const { codigo, precio, precioIva, iva } = producto;
+                //    console.log(codigo, precio, precioIva, iva);
+                const productoDB = await Producto.findOneAndUpdate({ codigo, proveedor: id }, { codigo, precio, precioIva, iva });
+                if (productoDB) {
                     cantActualizada++;
                 }
             } catch (error) {
-                console.log(error);
+                console.log('Explote en findOneAndUpdate producto', producto);
             }
-        }));
+        }))
     }
 
     return {
         cantActualizada,
-        cantTotal
+        cantTotal,
+        nombre,
     };
 }
 
