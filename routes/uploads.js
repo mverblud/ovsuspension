@@ -18,8 +18,8 @@ router.post('/', [
 ], cargarArchivo);
 
 router.post('/actualizar-precios/:id', [
-    validarJWT,
-    esAdminRole,
+    //validarJWT,
+    //esAdminRole,
     validarArchivoSubir,
     check('id', 'El proveedor es obligatorio').not().isEmpty(),
     check('id', 'No es un un ID válido').isMongoId(),

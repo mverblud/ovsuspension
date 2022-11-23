@@ -201,6 +201,7 @@ const impactarProductos = async (productos = []) => {
 const actualizarPrecioProducto = async (productos, id) => {
 
     let cantActualizada = 0;
+    let productoGuardado = [];
 
     const [cantTotal, proveedor] = await Promise.all([
         Producto.countDocuments({ proveedor: id }),
@@ -213,13 +214,42 @@ const actualizarPrecioProducto = async (productos, id) => {
         await Promise.all(productos.map(async producto => {
             try {
                 const { codigo, precio, precioIva, iva } = producto;
-                //    console.log(codigo, precio, precioIva, iva);
-                const productoDB = await Producto.findOneAndUpdate({ codigo, proveedor: id }, { codigo, precio, precioIva, iva });
-                if (productoDB) {
-                    cantActualizada++;
+                const productosDB = await Producto.find({ codigo, proveedor: id });
+                if (productosDB.length !== 0) {
+                    if (productosDB.length === 1) {
+                        const productoUpd = await Producto.findByIdAndUpdate({ _id: productosDB[0]._id }, { precio, precioIva, iva });
+                        if (productoUpd) {
+                            cantActualizada++;
+                            productoGuardado.push({
+                                producto: productoUpd._id,
+                                precioAnterior: productoUpd.precio,
+                                precioNuevo: precio,
+                                diferencia: (precio - productoUpd.precio).toFixed(2)
+                            });
+
+                        }
+                    } else {
+                        await Promise.all(productosDB.map(async producto => {
+                            try {
+                                const { _id } = producto;
+                                const productoUpd = await Producto.findByIdAndUpdate({ _id }, { precio, precioIva, iva });
+                                if (productoUpd) {
+                                    cantActualizada++;
+                                    productoGuardado.push({
+                                        producto: productoUpd._id,
+                                        precioAnterior: productoUpd.precio,
+                                        precioNuevo: precio,
+                                        diferencia: (precio - productoUpd.precio).toFixed(2)
+                                    });
+                                }
+                            } catch (error) {
+                                console.log('Explote en actualizarPrecioProducto3 update ++ producto', producto, error);
+                            }
+                        }))
+                    }
                 }
             } catch (error) {
-                console.log('Explote en findOneAndUpdate producto', producto);
+                console.log('Explote en actualizarPrecioProducto3 producto', producto, error);
             }
         }))
     }
@@ -228,11 +258,12 @@ const actualizarPrecioProducto = async (productos, id) => {
         cantActualizada,
         cantTotal,
         nombre,
+        productoGuardado
     };
 }
 
 export {
     impactarLista,
     impactarProductos,
-    actualizarPrecioProducto
+    actualizarPrecioProducto,
 }

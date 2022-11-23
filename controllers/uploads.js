@@ -1,6 +1,7 @@
 import { subirArchivo } from "../helpers/subir-archivo.js";
 import { leerLista, leerListaPrecios } from '../helpers/leerLista.js';
 import { actualizarPrecioProducto, impactarLista, impactarProductos } from "../helpers/impactarLista.js";
+//import ActualizaPrecios from "../models/actualizaPrecios.js";
 
 const cargarArchivo = async (req, res) => {
 
@@ -38,8 +39,26 @@ const actualizarPrecios = async (req, res) => {
         const { header } = req.body;
 
         const uploadPath = await subirArchivo(req.files, undefined, 'lista');
+        //  Obtengo solo el nombre
+        const nombreCortado = uploadPath.split('\\');
+        const nombreArch = nombreCortado[nombreCortado.length - 1];
+
+        //  Obtengo productos desde archivo
         const { productos } = await leerListaPrecios(uploadPath, header);
-        const { cantActualizada, cantTotal, nombre } = await actualizarPrecioProducto(productos, id);
+        //  Impacto en la BD
+        const { cantActualizada, cantTotal, nombre, productoGuardado } = await actualizarPrecioProducto(productos, id);
+
+/*         // Grabo info de la actualizacion de precio en BD
+        const actualizaPrecio = new ActualizaPrecios({
+            nombreArch,
+            proveedor: id,
+            cantLeidos: productos.length,
+            cantActualizados: cantActualizada,
+            productos: productoGuardado
+        })
+
+        // Guardar en BD
+        await actualizaPrecio.save(); */
 
         res.json({
             proveedor: {
@@ -47,20 +66,19 @@ const actualizarPrecios = async (req, res) => {
                 cantProductos: cantTotal,
             },
             infoArchivo: {
-                nombreArchivo: uploadPath,
+                nombreArchivo: nombreArch,
                 header,
                 productosLeidos: productos.length,
             },
             resultado: {
-                cantLeida: cantActualizada,
+                cantLeidos: cantActualizada,
                 cantActualizada,
-                cantNoEncontrada: (productos.length - cantActualizada),
             },
         });
 
     } catch (error) {
         console.log('Error al cargarArchivo', error);
-        res.status(400).json({ msg: 'Error al cargarArchivo' });
+        res.status(400).json({ msg: 'Error al cargarArchivo', error });
     }
 }
 
