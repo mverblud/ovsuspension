@@ -1,7 +1,7 @@
 import { subirArchivo } from "../helpers/subir-archivo.js";
 import { leerLista, leerListaPrecios } from '../helpers/leerLista.js';
 import { actualizarPrecioProducto, impactarLista, impactarProductos } from "../helpers/impactarLista.js";
-//import ActualizaPrecios from "../models/actualizaPrecios.js";
+import HistorialPrecios from "../models/historialPrecios.js";
 
 const cargarArchivo = async (req, res) => {
 
@@ -48,8 +48,8 @@ const actualizarPrecios = async (req, res) => {
         //  Impacto en la BD
         const { cantActualizada, cantTotal, nombre, productoGuardado } = await actualizarPrecioProducto(productos, id);
 
-/*         // Grabo info de la actualizacion de precio en BD
-        const actualizaPrecio = new ActualizaPrecios({
+        // Grabo info de la actualizacion de precio en BD
+        const historialPrecio = new HistorialPrecios({
             nombreArch,
             proveedor: id,
             cantLeidos: productos.length,
@@ -58,7 +58,7 @@ const actualizarPrecios = async (req, res) => {
         })
 
         // Guardar en BD
-        await actualizaPrecio.save(); */
+        await historialPrecio.save();
 
         res.json({
             proveedor: {

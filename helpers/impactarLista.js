@@ -213,40 +213,46 @@ const actualizarPrecioProducto = async (productos, id) => {
     if (cantTotal !== 0) {
         await Promise.all(productos.map(async producto => {
             try {
+                //  Se realiza un find porque existe mas de un producto con el mismo codigo , y luego findbyIdUpdate para obtener el documento
+                //  que se actualizo para guardar en en historialPrecios
                 const { codigo, precio, precioIva, iva } = producto;
                 const productosDB = await Producto.find({ codigo, proveedor: id });
                 if (productosDB.length !== 0) {
-                    if (productosDB.length === 1) {
-                        const productoUpd = await Producto.findByIdAndUpdate({ _id: productosDB[0]._id }, { precio, precioIva, iva });
-                        if (productoUpd) {
-                            cantActualizada++;
-                            productoGuardado.push({
-                                producto: productoUpd._id,
-                                precioAnterior: productoUpd.precio,
-                                precioNuevo: precio,
-                                diferencia: (precio - productoUpd.precio).toFixed(2)
-                            });
-
-                        }
-                    } else {
-                        await Promise.all(productosDB.map(async producto => {
-                            try {
-                                const { _id } = producto;
-                                const productoUpd = await Producto.findByIdAndUpdate({ _id }, { precio, precioIva, iva });
-                                if (productoUpd) {
-                                    cantActualizada++;
-                                    productoGuardado.push({
-                                        producto: productoUpd._id,
-                                        precioAnterior: productoUpd.precio,
-                                        precioNuevo: precio,
-                                        diferencia: (precio - productoUpd.precio).toFixed(2)
-                                    });
-                                }
-                            } catch (error) {
-                                console.log('Explote en actualizarPrecioProducto3 update ++ producto', producto, error);
+                    if (productosDB[0].precio !== precio) {
+                        if (productosDB.length === 1) {
+                            //  Actualizo cuando cambia el precio
+                            const productoUpd = await Producto.findByIdAndUpdate({ _id: productosDB[0]._id }, { precio, precioIva, iva });
+                            if (productoUpd) {
+                                cantActualizada++;
+                                productoGuardado.push({
+                                    producto: productoUpd._id,
+                                    precioAnterior: productoUpd.precio,
+                                    precioNuevo: precio,
+                                    diferencia: (precio - productoUpd.precio).toFixed(2)
+                                });
                             }
-                        }))
+                        } else {
+                            await Promise.all(productosDB.map(async producto => {
+                                try {
+                                    const { _id, } = producto;
+                                    const productoUpd = await Producto.findByIdAndUpdate({ _id }, { precio, precioIva, iva });
+                                    if (productoUpd) {
+                                        cantActualizada++;
+                                        productoGuardado.push({
+                                            producto: productoUpd._id,
+                                            precioAnterior: productoUpd.precio,
+                                            precioNuevo: precio,
+                                            diferencia: (precio - productoUpd.precio).toFixed(2)
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.log('Explote en actualizarPrecioProducto3 update ++ producto', producto, error);
+                                }
+                            }))
+                        }
                     }
+                }else{
+                    console.log(codigo);
                 }
             } catch (error) {
                 console.log('Explote en actualizarPrecioProducto3 producto', producto, error);

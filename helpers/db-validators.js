@@ -1,11 +1,12 @@
-import MarcaAuto       from '../models/marcaAuto.js';
-import MarcaAutoModelo from '../models/marcaAutoModelo.js';
-import MarcaProducto   from '../models/marcaProducto.js';
-import Categoria       from '../models/categoria.js';
-import Producto        from '../models/producto.js';
-import Role            from '../models/role.js';
-import Usuario         from '../models/usuario.js';
-import Provedor from '../models/proveedor.js';
+import MarcaAuto        from '../models/marcaAuto.js';
+import MarcaAutoModelo  from '../models/marcaAutoModelo.js';
+import MarcaProducto    from '../models/marcaProducto.js';
+import Categoria        from '../models/categoria.js';
+import Producto         from '../models/producto.js';
+import Role             from '../models/role.js';
+import Usuario          from '../models/usuario.js';
+import Provedor         from '../models/proveedor.js';
+import HistorialPrecios from '../models/historialPrecios.js';
 
 const esRolValido = async (rol = '') => {
     const existeRol = await Role.findOne({ rol });
@@ -81,6 +82,13 @@ const camposObligatorios = async (array) => {
     } 
 }
 
+const existeHistorialPrecios = async (id = '') => {
+    const existeHistorialPrecios = await HistorialPrecios.findById({ _id:id });
+    if (!existeHistorialPrecios) {
+        throw new Error(`El id no existe ${id}`);
+    }
+}
+
 export {
     esRolValido,
     emailExiste,
@@ -91,5 +99,6 @@ export {
     existeCategoria,
     existeProducto,
     existeProveedor,
-    camposObligatorios
+    camposObligatorios,
+    existeHistorialPrecios
 }

@@ -4,6 +4,7 @@ import fileUpload from "express-fileupload";
 
 import dbConnection           from '../database/config.js';
 import authRoute              from '../routes/auth.js';
+import historialPreciosRoute  from '../routes/historialPrecios.js';
 import buscarRoute            from '../routes/buscar.js';
 import usuariosRoute          from '../routes/usuarios.js';
 import categoriasRoute        from '../routes/categorias.js';
@@ -21,6 +22,7 @@ export default class Server {
         this.port = process.env.PORT;
         this.path = {
             auth:              '/api/auth',
+            historialPrecios:  '/api/historialPrecios',
             buscar :           '/api/buscar',
             categorias:        '/api/categorias',
             marcaAutos:        '/api/marcaAutos',
@@ -64,6 +66,7 @@ export default class Server {
     routes() {
 
         this.app.use(this.path.auth, authRoute);
+        this.app.use(this.path.historialPrecios, historialPreciosRoute);
         this.app.use(this.path.buscar, buscarRoute);
         this.app.use(this.path.categorias, categoriasRoute);
         this.app.use(this.path.productos, productosRoute);
