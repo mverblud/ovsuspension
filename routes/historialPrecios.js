@@ -6,7 +6,7 @@ import validarJWT from "../middlewares/validarJWT.js";
 
 import { existeHistorialPrecios } from '../helpers/db-validators.js';
 import { esAdminRole } from '../middlewares/validar-roles.js';
-import { obtenerActualizaPrecios, obtenerHistorialPrecio, obtenerHistorialPrecios } from "../controllers/historialPrecios.js";
+import { borrarHistorialPrecios, obtenerHistorialPrecio, obtenerHistorialPrecios } from "../controllers/historialPrecios.js";
 
 const router = Router();
 
