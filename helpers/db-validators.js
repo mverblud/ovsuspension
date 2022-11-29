@@ -1,11 +1,11 @@
-import MarcaAuto        from '../models/marcaAuto.js';
-import MarcaAutoModelo  from '../models/marcaAutoModelo.js';
-import MarcaProducto    from '../models/marcaProducto.js';
-import Categoria        from '../models/categoria.js';
-import Producto         from '../models/producto.js';
-import Role             from '../models/role.js';
-import Usuario          from '../models/usuario.js';
-import Provedor         from '../models/proveedor.js';
+import MarcaAuto from '../models/marcaAuto.js';
+import MarcaAutoModelo from '../models/marcaAutoModelo.js';
+import MarcaProducto from '../models/marcaProducto.js';
+import Categoria from '../models/categoria.js';
+import Producto from '../models/producto.js';
+import Role from '../models/role.js';
+import Usuario from '../models/usuario.js';
+import Provedor from '../models/proveedor.js';
 import HistorialPrecios from '../models/historialPrecios.js';
 
 const esRolValido = async (rol = '') => {
@@ -23,7 +23,7 @@ const emailExiste = async (email = '') => {
 }
 
 const existeMarcaAuto = async (id = '') => {
-    const existeMarca = await MarcaAuto.findById({ _id:id });
+    const existeMarca = await MarcaAuto.findById({ _id: id });
     if (!existeMarca) {
         throw new Error(`El id no existe ${id}`);
     }
@@ -37,35 +37,35 @@ const existeUsuarioPorId = async (id = '') => {
 }
 
 const existeMarcaAutoModelo = async (id = '') => {
-    const existeMarcaModelo = await MarcaAutoModelo.findById({ _id:id });
+    const existeMarcaModelo = await MarcaAutoModelo.findById({ _id: id });
     if (!existeMarcaModelo) {
         throw new Error(`El id no existe ${id}`);
     }
 }
 
 const existeMarcaProducto = async (id = '') => {
-    const existeMarcaProducto = await MarcaProducto.findById({ _id:id });
+    const existeMarcaProducto = await MarcaProducto.findById({ _id: id });
     if (!existeMarcaProducto) {
         throw new Error(`El id no existe ${id}`);
     }
 }
 
 const existeCategoria = async (id = '') => {
-    const existeCategoria = await Categoria.findById({ _id:id });
+    const existeCategoria = await Categoria.findById({ _id: id });
     if (!existeCategoria) {
         throw new Error(`El id no existe ${id}`);
     }
 }
 
 const existeProducto = async (id = '') => {
-    const existeProducto = await Producto.findById({ _id:id });
+    const existeProducto = await Producto.findById({ _id: id });
     if (!existeProducto) {
         throw new Error(`El id no existe ${id}`);
     }
 }
 
 const existeProveedor = async (id = '') => {
-    const existeProveedor = await Provedor.findById({ _id:id });
+    const existeProveedor = await Provedor.findById({ _id: id });
     if (!existeProveedor) {
         throw new Error(`El id no existe ${id}`);
     }
@@ -73,19 +73,26 @@ const existeProveedor = async (id = '') => {
 
 const camposObligatorios = async (array) => {
 
-    if (!array.includes('codigo') ) {
+    if (!array.includes('codigo')) {
         throw new Error(`Es obligatorio que se incluya en el headers con los campos : Codigo`);
-    } 
+    }
 
-    if (!array.includes('precio') ) {
+    if (!array.includes('precio')) {
         throw new Error(`Es obligatorio que se incluya en el headers con los campos : Precio`);
-    } 
+    }
 }
 
 const existeHistorialPrecios = async (id = '') => {
-    const existeHistorialPrecios = await HistorialPrecios.findById({ _id:id });
+    const existeHistorialPrecios = await HistorialPrecios.findById({ _id: id });
     if (!existeHistorialPrecios) {
         throw new Error(`El id no existe ${id}`);
+    }
+}
+
+const tieneProductosProveedor = async (proveedor = '') => {
+    const tieneProductosProveedor = await Producto.countDocuments({ proveedor });
+    if (tieneProductosProveedor === 0) {
+        throw new Error(`El id de proveedor ingresado no tiene productos ${proveedor}`);
     }
 }
 
@@ -100,5 +107,6 @@ export {
     existeProducto,
     existeProveedor,
     camposObligatorios,
-    existeHistorialPrecios
+    existeHistorialPrecios,
+    tieneProductosProveedor
 }

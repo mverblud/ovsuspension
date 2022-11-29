@@ -2,6 +2,9 @@ import { subirArchivo } from "../helpers/subir-archivo.js";
 import { leerLista, leerListaPrecios } from '../helpers/leerLista.js';
 import { actualizarPrecioProducto, impactarLista, impactarProductos } from "../helpers/impactarLista.js";
 import HistorialPrecios from "../models/historialPrecios.js";
+import HistorialPreciosDetalle from "../models/historialPreciosDetalle.js";
+import Producto from "../models/producto.js";
+import Proveedor from "../models/proveedor.js";
 
 const cargarArchivo = async (req, res) => {
 
@@ -35,30 +38,43 @@ const cargarArchivo = async (req, res) => {
 const actualizarPrecios = async (req, res) => {
 
     try {
-        const { id } = req.params;
+        const { id: proveedor } = req.params;
         const { header } = req.body;
 
         const uploadPath = await subirArchivo(req.files, undefined, 'lista');
-        //  Obtengo solo el nombre
         const nombreCortado = uploadPath.split('\\');
         const nombreArch = nombreCortado[nombreCortado.length - 1];
 
         //  Obtengo productos desde archivo
         const { productos } = await leerListaPrecios(uploadPath, header);
-        //  Impacto en la BD
-        const { cantActualizada, cantTotal, nombre, productoGuardado } = await actualizarPrecioProducto(productos, id);
 
-        // Grabo info de la actualizacion de precio en BD
-        const historialPrecio = new HistorialPrecios({
+        //  Impacto en la BD
+        const { cantActualizada, productoGuardado } = await actualizarPrecioProducto(productos, proveedor);
+
+        // Info Proveedor
+        const [cantTotal, { nombre }] = await Promise.all([
+            Producto.countDocuments({ proveedor }),
+            Proveedor.findById({ _id: proveedor })
+        ]);
+
+    //  Grabo informacion de la actualizacion en la BD
+        const historialPrecio = await HistorialPrecios.create({
             nombreArch,
-            proveedor: id,
+            proveedor,
             cantLeidos: productos.length,
             cantActualizados: cantActualizada,
-            productos: productoGuardado
         })
 
-        // Guardar en BD
-        await historialPrecio.save();
+        // Grabo HistorialPrecioDetalle
+        await Promise.all(productoGuardado.map(async producto => {
+            await HistorialPreciosDetalle.create({
+                historialPrecio: historialPrecio._id,
+                producto: producto.producto,
+                precioAnterior: producto.precioAnterior,
+                precioNuevo: producto.precioNuevo,
+                diferencia: producto.diferencia
+            })
+        }))
 
         res.json({
             proveedor: {

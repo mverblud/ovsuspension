@@ -12,15 +12,6 @@ const historialPreciosSchema = mongoose.Schema(
         },
         cantLeidos: { type: Number },
         cantActualizados: { type: Number },
-        productos: [{
-            producto: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Producto'
-            },
-            precioAnterior: { type: Number },
-            precioNuevo: { type: Number },
-            diferencia: { type: Number }
-        }]
     },
     {
         timestamps: true

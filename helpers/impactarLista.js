@@ -198,73 +198,48 @@ const impactarProductos = async (productos = []) => {
     }));
 }
 
-const actualizarPrecioProducto = async (productos, id) => {
+const actualizarPrecioProducto = async (productos, proveedor) => {
 
     let cantActualizada = 0;
-    let productoGuardado = [];
+    let productosNew = [];
 
-    const [cantTotal, proveedor] = await Promise.all([
-        Producto.countDocuments({ proveedor: id }),
-        Proveedor.findById({ _id: id })
-    ])
-
-    const { nombre } = proveedor;
-
-    if (cantTotal !== 0) {
-        await Promise.all(productos.map(async producto => {
-            try {
-                //  Se realiza un find porque existe mas de un producto con el mismo codigo , y luego findbyIdUpdate para obtener el documento
-                //  que se actualizo para guardar en en historialPrecios
-                const { codigo, precio, precioIva, iva } = producto;
-                const productosDB = await Producto.find({ codigo, proveedor: id });
-                if (productosDB.length !== 0) {
-                    if (productosDB[0].precio !== precio) {
-                        if (productosDB.length === 1) {
-                            //  Actualizo cuando cambia el precio
-                            const productoUpd = await Producto.findByIdAndUpdate({ _id: productosDB[0]._id }, { precio, precioIva, iva });
-                            if (productoUpd) {
-                                cantActualizada++;
-                                productoGuardado.push({
-                                    producto: productoUpd._id,
-                                    precioAnterior: productoUpd.precio,
-                                    precioNuevo: precio,
-                                    diferencia: (precio - productoUpd.precio).toFixed(2)
-                                });
-                            }
-                        } else {
-                            await Promise.all(productosDB.map(async producto => {
-                                try {
-                                    const { _id, } = producto;
-                                    const productoUpd = await Producto.findByIdAndUpdate({ _id }, { precio, precioIva, iva });
-                                    if (productoUpd) {
-                                        cantActualizada++;
-                                        productoGuardado.push({
-                                            producto: productoUpd._id,
-                                            precioAnterior: productoUpd.precio,
-                                            precioNuevo: precio,
-                                            diferencia: (precio - productoUpd.precio).toFixed(2)
-                                        });
-                                    }
-                                } catch (error) {
-                                    console.log('Explote en actualizarPrecioProducto3 update ++ producto', producto, error);
-                                }
-                            }))
-                        }
+//  Verifico si existe y genero array para porder realizar update
+    await Promise.all(productos.map(async producto => {
+        const { codigo, precio, precioIva, iva } = producto;
+        const productosDB = await Producto.find({ codigo, proveedor });
+        if (productosDB.length !== 0) {
+            productosDB.forEach(producto => {
+                if (producto.precio !== precio) {
+                    const productoNew = {
+                        producto: producto._id,
+                        precioIva,
+                        iva,
+                        precioAnterior: producto.precio,
+                        precioNuevo: precio,
+                        diferencia: (precio - producto.precio).toFixed(2)
                     }
-                }else{
-                    console.log(codigo);
+                    productosNew.push(productoNew);
                 }
-            } catch (error) {
-                console.log('Explote en actualizarPrecioProducto3 producto', producto, error);
+            })
+        }
+    }))
+
+//  Impacto los productos
+    await Promise.all(productosNew.map(async producto => {
+        try {
+            const { _id, precioNuevo: precio, precioIva, iva } = producto;
+            const productoUpd = await Producto.updateOne({ _id }, { precio, precioIva, iva });
+            if (productoUpd) {
+                cantActualizada++;
             }
-        }))
-    }
+        } catch (error) {
+            console.log('Explote en updateOne', error);
+        }
+    }))
 
     return {
         cantActualizada,
-        cantTotal,
-        nombre,
-        productoGuardado
+        productoGuardado: productosNew
     };
 }
 

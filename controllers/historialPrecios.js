@@ -4,18 +4,11 @@ const obtenerHistorialPrecios = async (req, res) => {
 
     try {
         const { limite = 50, desde = 0 } = req.query;
-        const query = { estado: true }
 
         const [total, historialPrecios] = await Promise.all([
-            HistorialPrecios.countDocuments(query),
-            HistorialPrecios.find(query)
+            HistorialPrecios.countDocuments(),
+            HistorialPrecios.find()
                 .populate('proveedor', 'nombre')
-                .populate({
-                    path: 'productos.producto',
-                    model: 'Producto',
-                    select: ['codigo', 'nombre'],
-                    //        perDocumentLimit: 5
-                })
                 .skip(Number(desde))
                 .limit(Number(limite))
                 .sort({ nombre: 1 })
@@ -37,12 +30,7 @@ const obtenerHistorialPrecios = async (req, res) => {
 const obtenerHistorialPrecio = async (req = request, res = response) => {
     try {
         const { id } = req.params;
-        const historialPrecio = await HistorialPrecios.findById({ _id: id }).populate('proveedor', 'nombre').populate({
-            path: 'productos.producto',
-            model: 'Producto',
-            select: ['codigo', 'nombre'],
-            //    perDocumentLimit: 2
-        });
+        const historialPrecio = await HistorialPrecios.findById({ _id: id }).populate('proveedor', 'nombre');
         res.json({ historialPrecio });
     } catch (error) {
         console.log(error);
