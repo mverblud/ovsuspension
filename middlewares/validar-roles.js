@@ -12,8 +12,6 @@ const esAdminRole = (req, res, next) => {
         return res.status(401).json({
             msg: `${nombre} no es administrador!`
         })
-    } else {
-
     }
 
     next()

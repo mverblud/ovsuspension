@@ -138,7 +138,7 @@ const completoProductos = async (productos, categoriasIds, marcasIds, marcaProdu
     categoriasIds.forEach(categoria => {
         productos.forEach(producto => {
             if (producto.categoria === categoria.nombre) {
-                producto.categoriaId = categoria.id
+                producto.categoria = categoria.id
             }
         })
     });
@@ -146,7 +146,7 @@ const completoProductos = async (productos, categoriasIds, marcasIds, marcaProdu
     marcasIds.forEach(marca => {
         productos.forEach(producto => {
             if (producto.marcaAuto === marca.nombre) {
-                producto.marcaAutoId = marca.id;
+                producto.marcaAuto = marca.id;
             }
         })
     });
@@ -154,7 +154,7 @@ const completoProductos = async (productos, categoriasIds, marcasIds, marcaProdu
     marcaProductosIds.forEach(marcaP => {
         productos.forEach(producto => {
             if (producto.marcaProducto === marcaP.nombre) {
-                producto.marcaProductoId = marcaP.id;
+                producto.marcaProducto = marcaP.id;
             }
         })
     });
@@ -162,40 +162,20 @@ const completoProductos = async (productos, categoriasIds, marcasIds, marcaProdu
     proveedoresIds.forEach(proveedor => {
         productos.forEach(producto => {
             if (producto.proveedor === proveedor.nombreCorto) {
-                producto.proveedorId = proveedor.id;
+                producto.proveedor = proveedor.id;
             }
         })
     });
-
-    console.log(productos);
 
 }
 
 const impactarProductos = async (productos = []) => {
 
-    await Promise.all(productos.map(async (producto) => {
-
-        try {
-            let { codigo, marcaProductoId, marcaAutoId, categoriaId, nombre, proveedorId } = producto;
-            const productoDB = await Producto.findOne({ codigo });
-            if (!productoDB) {
-                const producto = new Producto({
-                    codigo,
-                    nombre,
-                    marcaAuto: marcaAutoId,
-                    marcaProducto: marcaProductoId,
-                    categoria: categoriaId,
-                    proveedor: proveedorId
-                });
-
-                // Guardar en BD
-                await producto.save();
-            }
-        } catch (error) {
-            console.log('impactarProductos', error);
-        }
-
-    }));
+    try {
+        Producto.insertMany(productos)
+    } catch (error) {
+        console.log('insertMany Productos', error);
+    }
 }
 
 const actualizarPrecioProducto = async (productos, proveedor) => {
@@ -203,7 +183,7 @@ const actualizarPrecioProducto = async (productos, proveedor) => {
     let cantActualizada = 0;
     let productosNew = [];
 
-//  Verifico si existe y genero array para porder realizar update
+    //  Verifico si existe y genero array para porder realizar update
     await Promise.all(productos.map(async producto => {
         const { codigo, precio, precioIva, iva } = producto;
         const productosDB = await Producto.find({ codigo, proveedor });
@@ -211,12 +191,12 @@ const actualizarPrecioProducto = async (productos, proveedor) => {
             productosDB.forEach(producto => {
                 if (producto.precio !== precio) {
                     const productoNew = {
-                        producto: producto._id,
+                        _id: producto._id,
                         precioIva,
                         iva,
                         precioAnterior: producto.precio,
                         precioNuevo: precio,
-                        diferencia: (precio - producto.precio).toFixed(2)
+                        diferencia: parseFloat((precio - producto.precio).toFixed(2))
                     }
                     productosNew.push(productoNew);
                 }
@@ -224,11 +204,13 @@ const actualizarPrecioProducto = async (productos, proveedor) => {
         }
     }))
 
-//  Impacto los productos
+    console.log(productosNew);
+
+    //  Impacto los productos
     await Promise.all(productosNew.map(async producto => {
         try {
-            const { _id, precioNuevo: precio, precioIva, iva } = producto;
-            const productoUpd = await Producto.updateOne({ _id }, { precio, precioIva, iva });
+            const { _id, precioNuevo, precioIva, iva } = producto;
+            const productoUpd = await Producto.updateOne({ _id }, { precio: precioNuevo, precioIva, iva });
             if (productoUpd) {
                 cantActualizada++;
             }

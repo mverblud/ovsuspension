@@ -69,7 +69,7 @@ const actualizarPrecios = async (req, res) => {
         await Promise.all(productoGuardado.map(async producto => {
             await HistorialPreciosDetalle.create({
                 historialPrecio: historialPrecio._id,
-                producto: producto.producto,
+                producto: producto._id,
                 precioAnterior: producto.precioAnterior,
                 precioNuevo: producto.precioNuevo,
                 diferencia: producto.diferencia

@@ -4,7 +4,7 @@ import fs from 'fs';
 const leerLista = (nombreArch) => {
     return new Promise((resolve, reject) => {
 
-        const productos = [];
+        let productos = [];
         const marcaProductos = [];
         const marcaAutos = [];
         const categorias = [];
@@ -49,6 +49,9 @@ const leerLista = (nombreArch) => {
                 productos.push(producto);
             })
             .on('end', () => {
+
+                productos = productos.filter(producto => producto.codigo !== '');
+                productos = productos.filter(producto => producto.nombre !== '');
 
                 resolve({
                     productos,

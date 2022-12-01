@@ -15,6 +15,7 @@ import Role from '../models/role.js';
 import Usuario from '../models/usuario.js';
 import Proveedores from '../models/proveedor.js';
 import HistorialPrecios from '../models/historialPrecios.js'
+import HistorialPreciosDetalle from '../models/historialPreciosDetalle.js';
 
 import dotenv from  "dotenv";
 dotenv.config();
@@ -60,6 +61,7 @@ const eliminarDatos = async () => {
             Usuario.deleteMany(),
             Proveedores.deleteMany(),
             HistorialPrecios.deleteMany(),
+            HistorialPreciosDetalle.deleteMany(),
         ])
 
         console.log('Datos Elimnados Correctamente');
